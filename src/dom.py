@@ -81,8 +81,10 @@ class HtmlPage:
     root = None
     address = None
     title = None
+    tk_frame = None
 
-    def __init__(self, url):
+    def __init__(self, url, tk_parent):
+        self.tk_frame = tk.Frame(tk_parent)
         self.address = url
         response = request.urlopen(url)
 
@@ -95,6 +97,8 @@ class HtmlPage:
         for data in title_datas:
             title_string += data.get_attr("text")
         self.title = url if title_string.isspace() else title_string
+
+        self.add_tk()
 
     def __str__(self):
         return "[" + str(self.address) + "](" + str(self.title) + ")"
@@ -113,13 +117,13 @@ class HtmlPage:
             result = scratch
         return result
 
-    def add_tk(self, parent):
-        page_frame = ttk.Frame(parent)
-        self.root.add_tk(page_frame)
-        return page_frame
+    def add_tk(self):
+        self.root.add_tk(self.tk_frame)
 
     # Call before discarding a page to allow nodes to be freed
     def delete(self):
+        if self.tk_frame is not None:
+            self.tk_frame.destroy()
         if self.root is not None:
             self.root.delete()
 

@@ -3,6 +3,7 @@ import tkinter.ttk as ttk
 
 import dom
 
+homepage = 'https://info.cern.ch/hypertext/WWW/TheProject.html'
 
 # when changing page remember to delete the old one
 class Context:
@@ -26,6 +27,8 @@ class Context:
 
 class Conductor(Context):
     def __init__(self, cid, pages):
+        if not pages:
+            pages = [dom.HtmlPage(homepage, self.window)]
         super().__init__(cid, pages)
         ui = self.make_ui_frame()
         ui.pack(side='left', anchor=tk.NW)
@@ -55,13 +58,16 @@ class Conductor(Context):
     def go_to_page(self, url):
         print(url)
         try:
-            self.pages[0] = dom.HtmlPage(url)
+            if self.pages[0] is not None:
+                self.pages[0].delete()
+            self.pages[0] = dom.HtmlPage(url, self.window)
+            self.display_pages()
         except ValueError:
             print('invalid url')
 
     def display_pages(self):
         for page in self.pages:
-            page.add_tk(self.window).pack()
+            page.tk_frame.pack()
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()
