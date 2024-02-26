@@ -1,26 +1,21 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
+import dom
+
 
 # when changing page remember to delete the old one
 class Context:
+    cid = None
+    pages = []
+    window = tk.Tk()
+    window.geometry('500x200')
+    window.tk_setPalette(background="#ccccff")
+
     def __init__(self, cid, pages):
         self.cid = cid
         self.pages = pages
-
-        self.window = tk.Tk()
         self.window.title(cid)
-        self.window.geometry('500x200')
-        self.window.tk_setPalette(background="#ccccff")
-
-        exit_button = ttk.Button(self.window, text="X", command=self.window.destroy)
-
-        minimise_button = ttk.Button(self.window, text="_", command=lambda: self.window.state(newstate='iconic'))
-        maximise_button = ttk.Button(self.window, text="🗖", command=lambda: self.window.state(newstate='zoomed'))
-
-        exit_button.pack(side='right', anchor=tk.NE)
-        maximise_button.pack(side='right', anchor=tk.NE)
-        minimise_button.pack(side='right', anchor=tk.NE)
 
     def make_ui_frame(self):
         pass
@@ -34,6 +29,7 @@ class Conductor(Context):
         super().__init__(cid, pages)
         ui = self.make_ui_frame()
         ui.pack(side='left', anchor=tk.NW)
+        self.display_pages()
         self.window.mainloop()
 
     def make_ui_frame(self):
@@ -44,10 +40,10 @@ class Conductor(Context):
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
         # ToDo: fill in address loading
-        go_to_button = ttk.Button(ui_frame, text='Go To', command=lambda: print('address: ', address.get()))
+        go_to_button = ttk.Button(ui_frame, text='Go To', command=lambda: self.go_to_page(address.get()))
         # ToDo: fill in collaboration link generation
         collaboration_menu_button = ttk.Button(ui_frame, text='collaboration menu',
-                                               command=lambda: self.start_collaboration())
+                                               command=lambda: self.display_collaboration_options())
 
         address_bar.grid(column=0, row=1, sticky=tk.NW)
         go_to_button.grid(column=1, row=1, sticky=tk.W)
@@ -56,11 +52,24 @@ class Conductor(Context):
 
         return ui_frame
 
-    def start_collaboration(self):
+    def go_to_page(self, url):
+        print(url)
+        try:
+            self.pages[0] = dom.HtmlPage(url)
+        except ValueError:
+            print('invalid url')
+
+    def display_pages(self):
+        for page in self.pages:
+            page.add_tk(self.window).pack()
+
+    def display_collaboration_options(self):
         collab_menu = tk.Tk()
         collab_menu.geometry('300x100')
         collab_menu.title('collaboration for ' + self.cid)
-        link = ttk.Label(collab_menu, text='gaudy://this_is_a_placeholder')
+        link = tk.Text(collab_menu, height=1)
+        link.insert('1.0', 'gaudy://this_is_a_placeholder')
+        link['state'] = 'disabled'
         collab_label = ttk.Label(collab_menu, text='link for collaboration')
 
         connect_link = tk.StringVar()
@@ -73,6 +82,7 @@ class Conductor(Context):
         collab_label.pack()
         enter_link.pack()
         collab_button.pack()
+        collab_menu.mainloop()
 
 
 class Collaborator(Context):

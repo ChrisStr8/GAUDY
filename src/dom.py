@@ -1,6 +1,9 @@
 from urllib import request
 from html.parser import HTMLParser
 
+import tkinter as tk
+import tkinter.ttk as ttk
+
 
 class HtmlNode:
     parent = None
@@ -36,8 +39,14 @@ class HtmlNode:
                 return a[1]
         return None
 
-    def get_tk(self):
-        return None
+    def add_tk(self, parent):
+        label = None
+        if self.tag == 'data':
+            label = (ttk.Label(parent, text=self.get_attr("text")))
+            label.pack()
+        for child in self.children:
+            child.add_tk(parent)
+        return label
 
     # Remove all children recursively, allowing nodes to be freed by the garbage collector
     def delete(self):
@@ -103,6 +112,11 @@ class HtmlPage:
                 node.find_nodes(scratch, selector)
             result = scratch
         return result
+
+    def add_tk(self, parent):
+        page_frame = ttk.Frame(parent)
+        self.root.add_tk(page_frame)
+        return page_frame
 
     # Call before discarding a page to allow nodes to be freed
     def delete(self):
