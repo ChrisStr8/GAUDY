@@ -88,7 +88,7 @@ class HtmlPage:
         self.title = url if title_string.isspace() else title_string
 
     def __str__(self):
-        return "[" + str(self.address) + "](" + str(self.title) + ")"
+        return "[" + str(self.title) + "](" + str(self.address) + ")"
 
     def find_nodes(self, selector):
         result = list()
