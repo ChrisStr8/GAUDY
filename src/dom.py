@@ -101,7 +101,7 @@ class HtmlPage:
         self.add_tk()
 
     def __str__(self):
-        return "[" + str(self.address) + "](" + str(self.title) + ")"
+        return "[" + str(self.title) + "](" + str(self.address) + ")"
 
     def find_nodes(self, selector):
         result = list()
