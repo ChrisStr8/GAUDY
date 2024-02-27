@@ -45,7 +45,6 @@ class Conductor(Context):
         if not pages:
             self.pages = [dom.HtmlPage(homepage, self.root)]
         ui = self.make_ui_frame()
-        self.display_focused_page()
         self.window.mainloop()
 
     def make_ui_frame(self):
@@ -84,18 +83,13 @@ class Conductor(Context):
         try:
             if self.pages[self.focused_page] is not None:
                 self.pages[self.focused_page].delete()
-            self.pages[self.focused_page] = dom.HtmlPage(url, self.root)
-            self.display_focused_page()
+
+            page_frame = ttk.Frame(self.root, cursor='circle')
+            page_frame.grid(row=1, column=0)
+            self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
         except ValueError:
             print('invalid url')
 
-    def display_pages(self):
-        #for page in self.pages:
-        #    page.tk_frame.pack()
-        pass
-
-    def display_focused_page(self):
-        self.pages[self.focused_page].tk_frame.pack()  # place(x=100, y=100)
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()

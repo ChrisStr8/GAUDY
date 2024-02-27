@@ -43,7 +43,7 @@ class HtmlNode:
         label = None
         if self.tag == 'data':
             label = (ttk.Label(parent, text=self.get_attr("text")))
-            label.pack(anchor=tk.W)
+            label.grid(sticky=tk.W)
         for child in self.children:
             child.add_tk(parent)
         return label
@@ -83,9 +83,8 @@ class HtmlPage:
     title = None
     tk_frame = None
 
-    def __init__(self, url, tk_parent):
-        self.tk_frame = ttk.Frame(tk_parent, cursor='circle')
-        self.tk_frame.grid(row=1, column=0)
+    def __init__(self, url, tk_frame):
+        self.tk_frame = tk_frame
         self.address = url
         response = request.urlopen(url)
 
