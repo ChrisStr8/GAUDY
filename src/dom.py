@@ -84,7 +84,8 @@ class HtmlPage:
     tk_frame = None
 
     def __init__(self, url, tk_parent):
-        self.tk_frame = tk.Frame(tk_parent)
+        self.tk_frame = ttk.Frame(tk_parent)
+        self.tk_frame.grid(row=1, column=0)
         self.address = url
         response = request.urlopen(url)
 

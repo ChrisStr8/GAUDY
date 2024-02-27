@@ -8,15 +8,27 @@ homepage = 'https://info.cern.ch/hypertext/WWW/TheProject.html'
 # when changing page remember to delete the old one
 class Context:
     cid = None
-    pages = []
-    window = tk.Tk()
-    window.geometry('500x200')
-    window.tk_setPalette(background="#ccccff")
+    pages = None
+    window = None
+    root = None
 
-    def __init__(self, cid, pages):
+    def __init__(self, cid):
         self.cid = cid
-        self.pages = pages
+
+        self.window = tk.Tk()
+
+        # Configure Style
+        style = ttk.Style()
+        style.configure('Gaudy.TFrame', background='#ccccff')
+        style.configure('Gaudy.TButton', background='#800080', foreground='#39FF14', font=('Sans', '12', 'bold'))
+        style.configure('GaudyGo.TButton', background='#39ff14', foreground='#0000FF', font=('Sans', '12', 'bold'))
+        self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
+        self.root.grid(row=0, column=0, sticky=tk.NSEW)
+        self.root.grid_columnconfigure(0, weight=1)
         self.window.title(cid)
+        self.window.grid()
+        self.window.grid_columnconfigure(0, weight=1)
+
 
     def make_ui_frame(self):
         pass
@@ -27,31 +39,41 @@ class Context:
 
 class Conductor(Context):
     def __init__(self, cid, pages):
+        super().__init__(cid)
         if not pages:
-            pages = [dom.HtmlPage(homepage, self.window)]
-        super().__init__(cid, pages)
+            self.pages = [dom.HtmlPage(homepage, self.root)]
         ui = self.make_ui_frame()
-        ui.pack(side='left', anchor=tk.NW)
         self.display_pages()
         self.window.mainloop()
 
     def make_ui_frame(self):
-        ui_frame = ttk.Frame(self.window)
+        ui_frame = ttk.Frame(self.root)
+        ui_frame.grid(column=0, row=0, sticky=tk.EW)
 
-        label = ttk.Label(ui_frame, text='address bar', anchor=tk.E, background='#ccffff')
+        #TODO: Make these actually navigate
+        #TODO: Icons for nav buttons
+        nav_section = ttk.Frame(ui_frame)
+        ttk.Button(nav_section, text='Back', style='Gaudy.TButton').grid(column=0, row=1, sticky=tk.W)
+        ttk.Button(nav_section, text='Forward', style='Gaudy.TButton').grid(column=1, row=1, sticky=tk.E)
+
         address = tk.StringVar()
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
         # ToDo: fill in address loading
-        go_to_button = ttk.Button(ui_frame, text='Go To', command=lambda: self.go_to_page(address.get()))
+        go_to_button = ttk.Button(ui_frame, text='Go!', command=lambda: self.go_to_page(address.get()),
+                                  style='GaudyGo.TButton')
         # ToDo: fill in collaboration link generation
-        collaboration_menu_button = ttk.Button(ui_frame, text='collaboration menu',
-                                               command=lambda: self.display_collaboration_options())
+        collaborate_button = ttk.Button(ui_frame, text='Collaborate', command=lambda: self.display_collaboration_options(), style='Gaudy.TButton')
 
-        address_bar.grid(column=0, row=1, sticky=tk.NW)
-        go_to_button.grid(column=1, row=1, sticky=tk.W)
-        label.grid(column=0, row=2)
-        collaboration_menu_button.grid(column=1, row=2)
+        ui_frame.grid_columnconfigure(1, weight=1)
+        nav_section.grid(row=0, column=0, sticky=tk.W)
+        address_bar.grid(row=0, column=1, sticky=tk.NSEW)
+        go_to_button.grid(row=0, column=2, sticky=tk.E)
+        collaborate_button.grid(row=0, column=3, sticky=tk.E)
+        address_bar.bind('<Return>', lambda e: go_to_button.invoke())
+        self.window.bind('<Control-l>', lambda e: address_bar.focus())
+
+        address_bar.focus()
 
         return ui_frame
 
@@ -60,14 +82,15 @@ class Conductor(Context):
         try:
             if self.pages[0] is not None:
                 self.pages[0].delete()
-            self.pages[0] = dom.HtmlPage(url, self.window)
+            self.pages[0] = dom.HtmlPage(url, self.root)
             self.display_pages()
         except ValueError:
             print('invalid url')
 
     def display_pages(self):
-        for page in self.pages:
-            page.tk_frame.pack()
+        #for page in self.pages:
+        #    page.tk_frame.pack()
+        pass
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()
@@ -93,3 +116,6 @@ class Conductor(Context):
 
 class Collaborator(Context):
     pass
+
+if __name__ == '__main__':
+    c1 = Conductor('context1', [])
