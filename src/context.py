@@ -31,7 +31,6 @@ class Context:
         self.window.grid()
         self.window.grid_columnconfigure(0, weight=1)
 
-
     def make_ui_frame(self):
         pass
 
@@ -42,17 +41,17 @@ class Context:
 class Conductor(Context):
     def __init__(self, cid, pages):
         super().__init__(cid)
-        if not pages:
-            self.pages = [dom.HtmlPage(homepage, self.root)]
         ui = self.make_ui_frame()
+        self.pages = pages
+        self.go_to_page(homepage)
         self.window.mainloop()
 
     def make_ui_frame(self):
         ui_frame = ttk.Frame(self.root)
         ui_frame.grid(column=0, row=0, sticky=tk.EW)
 
-        #TODO: Make these actually navigate
-        #TODO: Icons for nav buttons
+        # TODO: Make these actually navigate
+        # TODO: Icons for nav buttons
         nav_section = ttk.Frame(ui_frame)
         ttk.Button(nav_section, text='Back', style='Gaudy.TButton').grid(column=0, row=1, sticky=tk.W)
         ttk.Button(nav_section, text='Forward', style='Gaudy.TButton').grid(column=1, row=1, sticky=tk.E)
@@ -64,7 +63,8 @@ class Conductor(Context):
         go_to_button = ttk.Button(ui_frame, text='Go!', command=lambda: self.go_to_page(address.get()),
                                   style='GaudyGo.TButton')
         # ToDo: fill in collaboration link generation
-        collaborate_button = ttk.Button(ui_frame, text='Collaborate', command=lambda: self.display_collaboration_options(), style='Gaudy.TButton')
+        collaborate_button = ttk.Button(ui_frame, text='Collaborate',
+                                        command=lambda: self.display_collaboration_options(), style='Gaudy.TButton')
 
         ui_frame.grid_columnconfigure(1, weight=1)
         nav_section.grid(row=0, column=0, sticky=tk.W)
@@ -84,12 +84,11 @@ class Conductor(Context):
             if self.pages[self.focused_page] is not None:
                 self.pages[self.focused_page].delete()
 
-            page_frame = ttk.Frame(self.root, cursor='circle')
+            page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
         except ValueError:
             print('invalid url')
-
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()
@@ -115,6 +114,7 @@ class Conductor(Context):
 
 class Collaborator(Context):
     pass
+
 
 if __name__ == '__main__':
     c1 = Conductor('context1', [])
