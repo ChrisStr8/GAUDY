@@ -43,7 +43,7 @@ class HtmlNode:
         label = None
         if self.tag == 'data':
             label = (ttk.Label(parent, text=self.get_attr("text")))
-            label.pack()
+            label.pack(anchor=tk.W)
         for child in self.children:
             child.add_tk(parent)
         return label
@@ -84,7 +84,7 @@ class HtmlPage:
     tk_frame = None
 
     def __init__(self, url, tk_parent):
-        self.tk_frame = tk.Frame(tk_parent)
+        self.tk_frame = tk.Frame(tk_parent, cursor='circle')
         self.address = url
         response = request.urlopen(url)
 
@@ -98,7 +98,7 @@ class HtmlPage:
             title_string += data.get_attr("text")
         self.title = url if title_string.isspace() else title_string
 
-        self.add_tk()
+        self.root.add_tk(self.tk_frame)
 
     def __str__(self):
         return "[" + str(self.title) + "](" + str(self.address) + ")"
@@ -116,9 +116,6 @@ class HtmlPage:
                 node.find_nodes(scratch, selector)
             result = scratch
         return result
-
-    def add_tk(self):
-        self.root.add_tk(self.tk_frame)
 
     # Call before discarding a page to allow nodes to be freed
     def delete(self):

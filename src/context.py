@@ -5,6 +5,7 @@ import dom
 
 homepage = 'https://info.cern.ch/hypertext/WWW/TheProject.html'
 
+
 # when changing page remember to delete the old one
 class Context:
     cid = None
@@ -12,6 +13,7 @@ class Context:
     window = tk.Tk()
     window.geometry('500x200')
     window.tk_setPalette(background="#ccccff")
+    focused_page = 0
 
     def __init__(self, cid, pages):
         self.cid = cid
@@ -32,7 +34,7 @@ class Conductor(Context):
         super().__init__(cid, pages)
         ui = self.make_ui_frame()
         ui.pack(side='left', anchor=tk.NW)
-        self.display_pages()
+        self.display_focused_page()
         self.window.mainloop()
 
     def make_ui_frame(self):
@@ -58,16 +60,19 @@ class Conductor(Context):
     def go_to_page(self, url):
         print(url)
         try:
-            if self.pages[0] is not None:
-                self.pages[0].delete()
-            self.pages[0] = dom.HtmlPage(url, self.window)
-            self.display_pages()
+            if self.pages[self.focused_page] is not None:
+                self.pages[self.focused_page].delete()
+            self.pages[self.focused_page] = dom.HtmlPage(url, self.window)
+            self.display_focused_page()
         except ValueError:
             print('invalid url')
 
     def display_pages(self):
         for page in self.pages:
             page.tk_frame.pack()
+
+    def display_focused_page(self):
+        self.pages[self.focused_page].tk_frame.pack()  # place(x=100, y=100)
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()
