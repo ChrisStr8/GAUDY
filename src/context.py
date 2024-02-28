@@ -24,6 +24,12 @@ class Context:
         style.configure('Gaudy.TFrame', background='#ccccff')
         style.configure('Gaudy.TButton', background='#800080', foreground='#39FF14', font=('Sans', '12', 'bold'))
         style.configure('GaudyGo.TButton', background='#39ff14', foreground='#0000FF', font=('Sans', '12', 'bold'))
+        style.configure('h1.TLabel', font=('Cooper Black', 20))
+        style.configure('h2.TLabel', font=('Cooper Black', 18))
+        style.configure('h3.TLabel', font=('Cooper Black', 16))
+        style.configure('h4.TLabel', font=('Cooper Black', 14))
+        style.configure('h5.TLabel', font=('Cooper Black', 12))
+        style.configure('h6.TLabel', font=('Cooper Black', 10))
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
         self.root.grid_columnconfigure(0, weight=1)
@@ -89,8 +95,8 @@ class Conductor(Context):
             page_frame.grid(row=1, column=0)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.pages[self.focused_page].title)
-        except ValueError:
-            print('invalid url')
+        except ValueError as e:
+            print(e)
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()
