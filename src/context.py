@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 import dom
+import serialiser
 
 homepage = 'http://127.0.0.1:8000//GuidingPrinciples.html'
 
@@ -89,6 +90,7 @@ class Conductor(Context):
             page_frame.grid(row=1, column=0)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.pages[self.focused_page].title)
+            print(serialiser.bytes_from_html(self.pages[self.focused_page]))
         except ValueError:
             print('invalid url')
 
