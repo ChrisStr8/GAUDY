@@ -88,6 +88,7 @@ class Conductor(Context):
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
+            self.window.title(self.pages[self.focused_page].title)
         except ValueError:
             print('invalid url')
 

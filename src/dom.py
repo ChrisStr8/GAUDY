@@ -10,6 +10,7 @@ class HtmlNode:
     children = None
     tag = None
     attrs = None
+    tk_object = None
 
     def __init__(self, parent, tag, attrs):
         self.parent = parent
@@ -45,6 +46,7 @@ class HtmlNode:
         for child in self.children:
             child.add_tk(frame)
         frame.grid()
+        self.tk_object = frame
         return frame
 
     # Remove all children recursively, allowing nodes to be freed by the garbage collector
@@ -63,6 +65,7 @@ class TitleNode(HtmlNode):
     def add_tk(self, parent):
         label = ttk.Label(parent, text=self.children[0].get_attr("text"))
         label.grid()
+        self.tk_object = label
         return label
 
 
