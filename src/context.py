@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 
 import dom
 
-homepage = 'https://info.cern.ch/hypertext/WWW/TheProject.html'
+homepage = 'http://127.0.0.1:8000//GuidingPrinciples.html'
 
 
 # when changing page remember to delete the old one
@@ -57,6 +57,7 @@ class Conductor(Context):
         ttk.Button(nav_section, text='Forward', style='Gaudy.TButton').grid(column=1, row=1, sticky=tk.E)
 
         address = tk.StringVar()
+        address.set(homepage)
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
         # ToDo: fill in address loading
