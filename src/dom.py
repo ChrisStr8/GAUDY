@@ -10,6 +10,7 @@ class HtmlNode:
     children = None
     tag = None
     attrs = None
+    tk_object = None
 
     def __init__(self, parent, tag, attrs):
         self.parent = parent
@@ -40,13 +41,13 @@ class HtmlNode:
         return None
 
     def add_tk(self, parent):
-        label = None
-        if self.tag == 'data':
-            label = (ttk.Label(parent, text=self.get_attr("text")))
-            label.grid(sticky=tk.W)
+        print('node')
+        frame = ttk.Frame(parent)
         for child in self.children:
-            child.add_tk(parent)
-        return label
+            child.add_tk(frame)
+        frame.grid()
+        self.tk_object = frame
+        return frame
 
     # Remove all children recursively, allowing nodes to be freed by the garbage collector
     def delete(self):
@@ -56,12 +57,65 @@ class HtmlNode:
         self.children = list()
 
 
+class HeadNode(HtmlNode):
+    pass
+
+
+class TitleNode(HtmlNode):
+    def add_tk(self, parent):
+        label = ttk.Label(parent, text=self.children[0].get_attr("text"))
+        label.grid()
+        self.tk_object = label
+        return label
+
+
+class BodyNode(HtmlNode):
+    def add_tk(self, parent):
+        # print('body node')
+        frame = ttk.Frame(parent)
+        for child in self.children:
+            child.add_tk(frame)
+        frame.grid(sticky=tk.W)
+        return frame
+
+
+class PNode(HtmlNode):
+    pass
+
+
+class DataNode(HtmlNode):
+    def add_tk(self, parent):
+        # print('data node')
+        # print('data: ', self.get_attr("text"))
+        text = tk.Text(parent, height=1)
+        text.insert('1.0', self.get_attr("text"))
+        text.grid()
+        return text
+
+
 class GaudyParser(HTMLParser):
     root = None
     parent = None
 
     def handle_starttag(self, tag, attrs):
-        node = HtmlNode(self.parent, tag, attrs)
+        node = None
+        if tag == 'head':
+            # print(tag)
+            node = HeadNode(self.parent, tag, attrs)
+        elif tag == 'title':
+            node = TitleNode(self.parent, tag, attrs)
+        elif tag == 'body':
+            # print(tag)
+            node = BodyNode(self.parent, tag, attrs)
+        elif tag == 'p':
+            # print(tag)
+            node = PNode(self.parent, tag, attrs)
+        elif tag == 'data':
+            # print(tag)
+            node = DataNode(self.parent, tag, attrs)
+        else:
+            node = HtmlNode(self.parent, tag, attrs)
+
         if self.parent is not None:
             self.parent.add_child(node)
         self.parent = node
@@ -123,10 +177,3 @@ class HtmlPage:
             self.tk_frame.destroy()
         if self.root is not None:
             self.root.delete()
-
-
-if __name__ == "__main__":
-    page = HtmlPage("https://example.com")
-    print(page)
-    print(page.root)
-    page.delete()
