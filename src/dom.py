@@ -130,8 +130,9 @@ class BrNode(HtmlNode):
         return line_break
 
 
-class ImageNode(HtmlNode):
+class ImgNode(HtmlNode):
     pass
+
 class DataNode(HtmlNode):
     def add_tk(self, parent, style):
         # print('data node')
@@ -180,8 +181,8 @@ class GaudyParser(HTMLParser):
             node = HrNode(self.parent, tag, attrs)
         elif tag == 'br':
             node = BrNode(self.parent, tag, attrs)
-        elif tag == 'image':
-            node = ImageNode(self.parent, tag, attrs)
+        elif tag == 'img':
+            node = ImgNode(self.parent, tag, attrs)
         elif tag == 'data':
             node = DataNode(self.parent, tag, attrs)
         else:
@@ -208,10 +209,26 @@ class HtmlPage:
     address = None
     title = None
     tk_frame = None
+    scrollbar = None
+    scroll_canvas = None
+    scroll_frame = None
 
     def __init__(self, url, tk_frame):
         self.tk_frame = tk_frame
         self.address = url
+
+        self.scroll_canvas = tk.Canvas(tk_frame)
+        self.scroll_frame = ttk.Frame(self.scroll_canvas)
+        self.scrollbar = tk.Scrollbar(tk_frame, orient="vertical", command=self.scroll_canvas.yview)
+        self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)
+        tk_frame.grid_columnconfigure(0, weight=1)
+
+        self.scrollbar.grid(column=3, sticky=tk.NS, rowspan=2)
+        self.scroll_canvas.grid(sticky=tk.NSEW)
+        self.scroll_canvas.create_window((0, 0), window=self.scroll_frame, anchor='nw')
+        self.scroll_frame.bind("<Configure>", self.function)
+
+
         response = request.urlopen(url)
 
         parser = GaudyParser()
@@ -224,8 +241,11 @@ class HtmlPage:
             title_string += data.get_attr("text")
         self.title = url if title_string.isspace() else title_string
 
-        self.root.add_tk(self.tk_frame, '')
+        self.root.add_tk(self.scroll_frame, '')
+        # self.root.add_tk(self.tk_frame, '')
 
+    def function(self, event):
+        self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"), width=1000, height=500)
     def __str__(self):
         return "[" + str(self.title) + "](" + str(self.address) + ")"
 
