@@ -34,9 +34,11 @@ class Context:
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
         self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
         self.window.title(cid)
         self.window.grid()
         self.window.grid_columnconfigure(0, weight=1)
+        self.window.grid_rowconfigure(0, weight=1)
 
     def make_ui_frame(self):
         pass
@@ -92,8 +94,8 @@ class Conductor(Context):
             if self.pages[self.focused_page] is not None:
                 self.pages[self.focused_page].delete()
 
-            page_frame = ttk.Frame(self.root, )
-            page_frame.grid(row=1, column=0)
+            page_frame = ttk.Frame(self.root)
+            page_frame.grid(row=1, column=0, sticky=tk.NSEW)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.pages[self.focused_page].title)
         except ValueError as e:

@@ -217,14 +217,20 @@ class HtmlPage:
         self.tk_frame = tk_frame
         self.address = url
 
-        self.scroll_canvas = tk.Canvas(tk_frame)
+        self.scroll_canvas = tk.Canvas(self.tk_frame)
         self.scroll_frame = ttk.Frame(self.scroll_canvas)
-        self.scrollbar = tk.Scrollbar(tk_frame, orient="vertical", command=self.scroll_canvas.yview)
-        self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)
-        tk_frame.grid_columnconfigure(0, weight=1)
+        self.scrollbar = tk.Scrollbar(self.tk_frame, orient="vertical", command=self.scroll_canvas.yview)
 
-        self.scrollbar.grid(column=3, sticky=tk.NS, rowspan=2)
-        self.scroll_canvas.grid(sticky=tk.NSEW)
+        self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.scrollbar.grid(column=1, row=0, sticky=tk.NSEW)
+        self.scroll_canvas.grid(column=0, row=0, sticky=tk.NSEW)
+        self.scroll_frame.grid(row=0, column=0, sticky=tk.NSEW)
+
+        self.tk_frame.grid_rowconfigure(0, weight=1)
+        self.tk_frame.grid_columnconfigure(0, weight=1)
+        self.scroll_frame.grid_rowconfigure(0, weight=1)
+
         self.scroll_canvas.create_window((0, 0), window=self.scroll_frame, anchor='nw')
         self.scroll_frame.bind("<Configure>", self.function)
 
@@ -242,7 +248,6 @@ class HtmlPage:
         self.title = url if title_string.isspace() else title_string
 
         self.root.add_tk(self.scroll_frame, '')
-        # self.root.add_tk(self.tk_frame, '')
 
     def function(self, event):
         self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"), width=1000, height=500)
