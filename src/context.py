@@ -25,12 +25,21 @@ class Context:
         style.configure('Gaudy.TFrame', background='#ccccff')
         style.configure('Gaudy.TButton', background='#800080', foreground='#39FF14', font=('Sans', '12', 'bold'))
         style.configure('GaudyGo.TButton', background='#39ff14', foreground='#0000FF', font=('Sans', '12', 'bold'))
+        style.configure('h1.TLabel', font=('Cooper Black', 20))
+        style.configure('h2.TLabel', font=('Cooper Black', 18))
+        style.configure('h3.TLabel', font=('Cooper Black', 16))
+        style.configure('h4.TLabel', font=('Cooper Black', 14))
+        style.configure('h5.TLabel', font=('Cooper Black', 12))
+        style.configure('h6.TLabel', font=('Cooper Black', 10))
+
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
         self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
         self.window.title(cid)
         self.window.grid()
         self.window.grid_columnconfigure(0, weight=1)
+        self.window.grid_rowconfigure(0, weight=1)
 
     def make_ui_frame(self):
         pass
@@ -40,11 +49,10 @@ class Context:
 
 
 class Conductor(Context):
-
-    def __init__(self, cid, pages):
+    def __init__(self, cid):
         super().__init__(cid)
         ui = self.make_ui_frame()
-        self.pages = pages
+        self.pages = [None]
         self.page_history = list()
         self.back_history = list()
         self.go_to_page(homepage)
@@ -97,12 +105,12 @@ class Conductor(Context):
                 self.pages[self.focused_page].delete()
 
             page_frame = ttk.Frame(self.root)
-            page_frame.grid(row=1, column=0)
+            page_frame.grid(row=1, column=0, sticky=tk.NSEW)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.pages[self.focused_page].title)
             print(serialiser.bytes_from_html(self.pages[self.focused_page]))
-        except ValueError:
-            print('invalid url')
+        except ValueError as e:
+            print(e)
 
     def back(self):
         # print(self.page_history)
