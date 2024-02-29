@@ -17,6 +17,8 @@
 - `attrs`
   - List of `(string,string)` tuples representing additional attributes assigned to a tag (eg. `class` or `id`).
   - `<data>` tags have the `text` attribute set to the text they contain.
+- `tk_object`
+  - Tk widget associated with this node. This is usually either a label or a frame.
 
 ### Methods
 
@@ -35,6 +37,11 @@
 - `delete()`
   - Nodes contain a reference to their parent, which can cause Python's reference counting garbage collection to believe that they are still reachable when they ought to be freed.
   - Calling `delete` recursively removes these references, allowing the garbage collector to do its job properly.
+- `add_tk()`
+  - Creates Tk widgets for this node, and recursively for all of its children.
+
+### Subclasses
+There are specialised subclasses of HtmlNode for each type of Html tag supported by Gaudy.
 
 ## Class `GaudyParser`
 
@@ -71,6 +78,9 @@ You probably shouldn't need to use it directly.
   - The Url associated with the page.
 - `Title`
   - The page title.
+- `tk_frame`
+  - The frame that the page is being displayed in.
+  - This is destroyed when the page is deleted
 
 ### Methods
 
