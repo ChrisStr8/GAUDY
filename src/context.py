@@ -39,12 +39,16 @@ class Context:
 
 
 class Conductor(Context):
+
     def __init__(self, cid, pages):
         super().__init__(cid)
         ui = self.make_ui_frame()
         self.pages = pages
+        self.page_history = list()
+        self.back_history = list()
         self.go_to_page(homepage)
         self.window.mainloop()
+
 
     def make_ui_frame(self):
         ui_frame = ttk.Frame(self.root)
@@ -53,14 +57,16 @@ class Conductor(Context):
         # TODO: Make these actually navigate
         # TODO: Icons for nav buttons
         nav_section = ttk.Frame(ui_frame)
-        ttk.Button(nav_section, text='Back', style='Gaudy.TButton').grid(column=0, row=1, sticky=tk.W)
-        ttk.Button(nav_section, text='Forward', style='Gaudy.TButton').grid(column=1, row=1, sticky=tk.E)
+        ttk.Button(nav_section, text='Back', style='Gaudy.TButton', command=self.back).grid(column=0, row=1,
+                                                                                            sticky=tk.W)
+        ttk.Button(nav_section, text='Forward', style='Gaudy.TButton', command=self.forward).grid(column=1, row=1,
+                                                                                                  sticky=tk.E)
 
         address = tk.StringVar()
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
         # ToDo: fill in address loading
-        go_to_button = ttk.Button(ui_frame, text='Go!', command=lambda: self.go_to_page(address.get()),
+        go_to_button = ttk.Button(ui_frame, text='Go!', command=lambda: self.go(address.get()),
                                   style='GaudyGo.TButton')
         # ToDo: fill in collaboration link generation
         collaborate_button = ttk.Button(ui_frame, text='Collaborate',
@@ -78,6 +84,10 @@ class Conductor(Context):
 
         return ui_frame
 
+    def go(self, url):
+        self.page_history.append(self.pages[self.focused_page].address)
+        self.go_to_page(url)
+
     def go_to_page(self, url):
         print(url)
         try:
@@ -87,8 +97,23 @@ class Conductor(Context):
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
+
         except ValueError:
             print('invalid url')
+
+    def back(self):
+        # print(self.page_history)
+        if len(self.page_history) > 0:
+            url = self.page_history.pop()
+            self.back_history.append(self.pages[self.focused_page].address)
+            self.go_to_page(url)
+            # print(self.back_history)
+
+    def forward(self):
+        print(self.back_history)
+        if len(self.back_history) > 0:
+            url = self.back_history.pop()
+            self.go(url)
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()
