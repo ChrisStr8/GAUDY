@@ -2,8 +2,9 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 import dom
+import serialiser
 
-homepage = 'https://info.cern.ch/hypertext/WWW/TheProject.html'
+homepage = 'http://127.0.0.1:8000//GuidingPrinciples.html'
 
 
 # when changing page remember to delete the old one
@@ -63,6 +64,7 @@ class Conductor(Context):
                                                                                                   sticky=tk.E)
 
         address = tk.StringVar()
+        address.set(homepage)
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
         # ToDo: fill in address loading
@@ -97,7 +99,8 @@ class Conductor(Context):
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
-
+            self.window.title(self.pages[self.focused_page].title)
+            print(serialiser.bytes_from_html(self.pages[self.focused_page]))
         except ValueError:
             print('invalid url')
 
