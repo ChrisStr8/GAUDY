@@ -58,6 +58,8 @@ class Conductor(Context):
         self.go_to_page(homepage)
         self.window.mainloop()
 
+    def current_page(self):
+        return self.pages[self.focused_page]
 
     def make_ui_frame(self):
         ui_frame = ttk.Frame(self.root)
@@ -91,37 +93,36 @@ class Conductor(Context):
         self.window.bind('<Control-l>', lambda e: address_bar.focus())
 
         address_bar.focus()
+        self.address_bar = address_bar
 
         return ui_frame
 
     def go(self, url):
-        self.page_history.append(self.pages[self.focused_page].address)
+        self.page_history.append(self.current_page().address)
         self.go_to_page(url)
 
     def go_to_page(self, url):
-        print(url)
+        self.address_bar.delete(0, tk.END)
+        self.address_bar.insert(0, url)
         try:
-            if self.pages[self.focused_page] is not None:
-                self.pages[self.focused_page].delete()
+            if self.current_page() is not None:
+                self.current_page().delete()
 
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0, sticky=tk.NSEW)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
-            self.window.title(self.pages[self.focused_page].title)
-            print(serialiser.bytes_from_html(self.pages[self.focused_page]))
+            self.window.title(self.current_page().title)
+            print(serialiser.bytes_from_html(self.current_page()))
         except ValueError as e:
             print(e)
 
     def back(self):
-        # print(self.page_history)
         if len(self.page_history) > 0:
             url = self.page_history.pop()
-            self.back_history.append(self.pages[self.focused_page].address)
+            self.back_history.append(self.current_page().address)
             self.go_to_page(url)
-            # print(self.back_history)
 
     def forward(self):
-        print(self.back_history)
         if len(self.back_history) > 0:
             url = self.back_history.pop()
             self.go(url)
