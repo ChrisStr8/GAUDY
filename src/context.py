@@ -49,9 +49,6 @@ class Context:
     def make_ui_frame(self):
         pass
 
-    def make_page_frame(self):
-        pass
-
 
 class Conductor(Context):
     def __init__(self, cid):
