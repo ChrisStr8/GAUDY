@@ -45,7 +45,7 @@ class HtmlNode:
         frame = ttk.Frame(parent)
         for child in self.children:
             child.add_tk(frame, style)
-        frame.grid()
+        frame.grid(stick=tk.W)
         self.tk_object = frame
         return frame
 
@@ -63,10 +63,10 @@ class HeadNode(HtmlNode):
 
 class TitleNode(HtmlNode):
     def add_tk(self, parent, style):
-        label = ttk.Label(parent, text=self.children[0].get_attr("text"))
-        label.grid()
-        self.tk_object = label
-        return label
+        # label = ttk.Label(parent, text=self.children[0].get_attr("text"))
+        # label.grid(stick=tk.W)
+        # self.tk_object = label
+        return None
 
 
 class BodyNode(HtmlNode):
@@ -81,11 +81,13 @@ class BodyNode(HtmlNode):
 
 
 class DivNode(HtmlNode):
-    pass
+    def add_tk(self, parent, style):
+        super().add_tk(parent, 'div.TLabel')
 
 
 class SpanNode(HtmlNode):
-    pass
+    def add_tk(self, parent, style):
+        super().add_tk(parent, 'span.TLabel')
 
 
 class ANode(HtmlNode):
@@ -94,8 +96,10 @@ class ANode(HtmlNode):
 
 class TableNode(HtmlNode):
     pass
+
 class PNode(HtmlNode):
-    pass
+    def add_tk(self, parent, style):
+        super().add_tk(parent, 'p.TLabel')
 
 
 class PreNode(HtmlNode):
@@ -119,14 +123,14 @@ class HNode(HtmlNode):
 class HrNode(HtmlNode):
     def add_tk(self, parent, style):
         line_break = ttk.Label(parent, text='--------------------------------\n')
-        line_break.grid()
+        line_break.grid(stick=tk.W)
         return line_break
 
 
 class BrNode(HtmlNode):
     def add_tk(self, parent, style):
         line_break = ttk.Label(parent, text='\n')
-        line_break.grid()
+        line_break.grid(stick=tk.W)
         return line_break
 
 
@@ -139,7 +143,7 @@ class DataNode(HtmlNode):
         self.attrs.append(('style', style))
         label = ttk.Label(parent, text=self.get_attr("text"), style=style)
         self.tk_object = label
-        label.grid()
+        label.grid(stick=tk.W)
         return label
 
 
@@ -216,7 +220,7 @@ class HtmlPage:
         self.address = url
 
         self.scroll_canvas = tk.Canvas(self.tk_frame)
-        self.scroll_frame = ttk.Frame(self.scroll_canvas)
+        self.scroll_frame = ttk.Frame(self.scroll_canvas, style='Gaudy.TFrame')
         self.scrollbar = tk.Scrollbar(self.tk_frame, orient="vertical", command=self.scroll_canvas.yview)
 
         self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)

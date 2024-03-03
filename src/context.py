@@ -4,7 +4,7 @@ import tkinter.ttk as ttk
 import dom
 import serialiser
 
-homepage = 'http://127.0.0.1:8000//GuidingPrinciples.html'
+homepage = 'http://127.0.0.1:8000//testPage.html'
 
 
 # when changing page remember to delete the old one
@@ -25,12 +25,17 @@ class Context:
         style.configure('Gaudy.TFrame', background='#ccccff')
         style.configure('Gaudy.TButton', background='#800080', foreground='#39FF14', font=('Sans', '12', 'bold'))
         style.configure('GaudyGo.TButton', background='#39ff14', foreground='#0000FF', font=('Sans', '12', 'bold'))
-        style.configure('h1.TLabel', font=('Cooper Black', 20))
-        style.configure('h2.TLabel', font=('Cooper Black', 18))
-        style.configure('h3.TLabel', font=('Cooper Black', 16))
-        style.configure('h4.TLabel', font=('Cooper Black', 14))
-        style.configure('h5.TLabel', font=('Cooper Black', 12))
-        style.configure('h6.TLabel', font=('Cooper Black', 10))
+
+        # element styles
+        style.configure('div.TLabel', font=('Georgia', 11), foreground='#ff00ff', background='#663d00')
+        style.configure('h1.TLabel', font=('Elephant', 20), foreground='#ff00ff', background='#663d00')
+        style.configure('h2.TLabel', font=('Elephant', 18), foreground='#cc00ff', background='#663d00')
+        style.configure('h3.TLabel', font=('Elephant', 16), foreground='#8000ff', background='#663d00')
+        style.configure('h4.TLabel', font=('Elephant', 14), foreground='#6600ff', background='#663d00')
+        style.configure('h5.TLabel', font=('Elephant', 12), foreground='#3333cc', background='#663d00')
+        style.configure('h6.TLabel', font=('Elephant', 10), foreground='#0000ff', background='#663d00')
+        style.configure('p.TLabel', font=('Terminal', 11), foreground='#00cc99', background='#663d00')
+        style.configure('span.TLabel', font=('Poor Richard', 11), foreground='#33cc33', background='#663d00')
 
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
