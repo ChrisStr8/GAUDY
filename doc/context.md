@@ -25,8 +25,6 @@
   - This will create a new Tk window, and a root ttk.Frame that will fill it.
 - `make_ui_frame()`
   - Create the user interface widgets for this context.
-- `make_page_frame()`
-  - Has no effect
 
 ## Class `Collaborator`
 
