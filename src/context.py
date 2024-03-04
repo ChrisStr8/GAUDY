@@ -77,10 +77,19 @@ class Conductor(Context):
         self.page_history = list()
         self.back_history = list()
         self.go_to_page(homepage)
+
+        self.window.bind("<Configure>", lambda x: self.set_label_length())
+
         self.window.mainloop()
 
     def current_page(self):
         return self.pages[self.focused_page]
+
+    def set_label_length(self):
+        width = self.root.winfo_width() - self.current_page().scrollbar.winfo_width()
+        for data in self.current_page().find_nodes('data'):
+            if data.tk_object is not None:
+                data.tk_object.configure(wraplength=width)
 
     def make_ui_frame(self):
         ui_frame = ttk.Frame(self.root)
@@ -134,13 +143,12 @@ class Conductor(Context):
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.current_page().title)
             for anchor in self.current_page().find_nodes('a'):
-                # print(anchor)
-                # print(anchor.tk_object)
                 children = list()
                 anchor.find_nodes(children, 'data')
                 href = anchor.get_attr('href')
                 for child in children:
-                    child.tk_object.bind("<Button-1>", lambda event: self.go_to_page(href))
+                    child.tk_object.bind("<Button-1>", lambda event: self.go(href))
+            self.set_label_length()
             print(serialiser.bytes_from_html(self.current_page()))
         except ValueError as e:
             print(e)

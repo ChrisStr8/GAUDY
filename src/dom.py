@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 
 import tkinter as tk
 import tkinter.ttk as ttk
+import re as re
 
 
 class HtmlNode:
@@ -210,6 +211,7 @@ class GaudyParser(HTMLParser):
 
     def handle_data(self, data):
         if not data.isspace():
+            data = re.sub(r'\s+', ' ', data)
             self.handle_starttag("data", [("text", data)])
             self.handle_endtag("data")
 
