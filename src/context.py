@@ -121,13 +121,14 @@ class Conductor(Context):
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.current_page().title)
             for anchor in self.current_page().find_nodes('a'):
-                print(anchor)
-                print(anchor.tk_object)
                 children = list()
                 anchor.find_nodes(children, 'data')
                 href = anchor.get_attr('href')
                 for child in children:
                     child.tk_object.bind("<Button-1>", lambda event: self.go(href))
+            for data in self.current_page().find_nodes('data'):
+                if data.tk_object is not None:
+                    data.tk_object.configure(wraplength=self.window.winfo_width() - 20)
             print(serialiser.bytes_from_html(self.current_page()))
         except ValueError as e:
             print(e)
