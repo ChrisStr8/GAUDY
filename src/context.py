@@ -157,9 +157,8 @@ class Conductor(Context):
             for anchor in self.current_page().find_nodes('a'):
                 children = list()
                 anchor.find_nodes(children, 'data')
-                href = anchor.get_attr('href')
                 for child in children:
-                    child.tk_object.bind("<Button-1>", lambda event: self.go(href))
+                    (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
             self.set_label_length()
             print(serialiser.bytes_from_html(self.current_page()))
         except ValueError as e:
