@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 
 import tkinter as tk
 import tkinter.ttk as ttk
+import re as re
 
 
 class HtmlNode:
@@ -95,7 +96,7 @@ class SpanNode(HtmlNode):
 class ANode(HtmlNode):
     def add_tk(self, parent, style):
         self.tk_object = super().add_tk(parent, 'a.TLabel')
-        self.tk_object.configure(cursor='circle')
+        self.tk_object.configure(cursor='hand2')
         return self.tk_object
 
     def a_clicked(self):
@@ -210,6 +211,7 @@ class GaudyParser(HTMLParser):
 
     def handle_data(self, data):
         if not data.isspace():
+            data = re.sub(r'\s+', ' ', data)
             self.handle_starttag("data", [("text", data)])
             self.handle_endtag("data")
 
