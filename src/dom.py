@@ -42,7 +42,7 @@ class HtmlNode:
 
     def add_tk(self, parent, style):
         # print('node')
-        frame = ttk.Frame(parent)
+        frame = ttk.Frame(parent, style=style)
         for child in self.children:
             child.add_tk(frame, style)
         frame.grid(stick=tk.W)
@@ -72,7 +72,7 @@ class TitleNode(HtmlNode):
 class BodyNode(HtmlNode):
     def add_tk(self, parent, style):
         # print('body node')
-        frame = ttk.Frame(parent)
+        frame = ttk.Frame(parent, style=style)
         for child in self.children:
             child.add_tk(frame, style)
         frame.grid(sticky=tk.W)
@@ -82,16 +82,24 @@ class BodyNode(HtmlNode):
 
 class DivNode(HtmlNode):
     def add_tk(self, parent, style):
-        super().add_tk(parent, 'div.TLabel')
+        self.tk_object = super().add_tk(parent, 'div.TLabel')
+        return self.tk_object
 
 
 class SpanNode(HtmlNode):
     def add_tk(self, parent, style):
-        super().add_tk(parent, 'span.TLabel')
+        self.tk_object = super().add_tk(parent, 'span.TLabel')
+        return self.tk_object
 
 
 class ANode(HtmlNode):
-    pass
+    def add_tk(self, parent, style):
+        self.tk_object = super().add_tk(parent, 'a.TLabel')
+        self.tk_object.configure(cursor='circle')
+        return self.tk_object
+
+    def a_clicked(self):
+        pass
 
 
 class TableNode(HtmlNode):
@@ -99,7 +107,7 @@ class TableNode(HtmlNode):
 
 class PNode(HtmlNode):
     def add_tk(self, parent, style):
-        super().add_tk(parent, 'p.TLabel')
+        return super().add_tk(parent, 'p.TLabel')
 
 
 class PreNode(HtmlNode):
@@ -112,7 +120,7 @@ class HNode(HtmlNode):
         self.h_level = h_level
 
     def add_tk(self, parent, style):
-        frame = ttk.Frame(parent)
+        frame = ttk.Frame(parent, style=style)
         for child in self.children:
             child.add_tk(frame, f'h{self.h_level}.TLabel')
         frame.grid(sticky=tk.W)
@@ -122,14 +130,14 @@ class HNode(HtmlNode):
 
 class HrNode(HtmlNode):
     def add_tk(self, parent, style):
-        line_break = ttk.Label(parent, text='--------------------------------\n')
+        line_break = ttk.Label(parent, text='--------------------------------\n', style='hr.TLabel')
         line_break.grid(stick=tk.W)
         return line_break
 
 
 class BrNode(HtmlNode):
     def add_tk(self, parent, style):
-        line_break = ttk.Label(parent, text='\n')
+        line_break = ttk.Label(parent, text='\n', style='br.TLabel')
         line_break.grid(stick=tk.W)
         return line_break
 
@@ -248,7 +256,7 @@ class HtmlPage:
             title_string += data.get_attr("text")
         self.title = url if title_string.isspace() else title_string
 
-        self.root.add_tk(self.scroll_frame, '')
+        self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame')
 
     def function(self, event):
         self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"), width=1000, height=500)

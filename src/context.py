@@ -27,15 +27,21 @@ class Context:
         style.configure('GaudyGo.TButton', background='#39ff14', foreground='#0000FF', font=('Sans', '12', 'bold'))
 
         # element styles
-        style.configure('div.TLabel', font=('Georgia', 11), foreground='#ff00ff', background='#663d00')
-        style.configure('h1.TLabel', font=('Elephant', 20), foreground='#ff00ff', background='#663d00')
-        style.configure('h2.TLabel', font=('Elephant', 18), foreground='#cc00ff', background='#663d00')
-        style.configure('h3.TLabel', font=('Elephant', 16), foreground='#8000ff', background='#663d00')
-        style.configure('h4.TLabel', font=('Elephant', 14), foreground='#6600ff', background='#663d00')
-        style.configure('h5.TLabel', font=('Elephant', 12), foreground='#3333cc', background='#663d00')
-        style.configure('h6.TLabel', font=('Elephant', 10), foreground='#0000ff', background='#663d00')
-        style.configure('p.TLabel', font=('Terminal', 11), foreground='#00cc99', background='#663d00')
-        style.configure('span.TLabel', font=('Poor Richard', 11), foreground='#33cc33', background='#663d00')
+        style.configure('div.TLabel', font=('Georgia', 11), foreground='#ff00ff', background='#ccccff')
+
+        style.configure('h1.TLabel', font=('Elephant', 20), foreground='#ff00ff', background='#ccccff')
+        style.configure('h2.TLabel', font=('Elephant', 18), foreground='#cc00ff', background='#ccccff')
+        style.configure('h3.TLabel', font=('Elephant', 16), foreground='#8000ff', background='#ccccff')
+        style.configure('h4.TLabel', font=('Elephant', 14), foreground='#6600ff', background='#ccccff')
+        style.configure('h5.TLabel', font=('Elephant', 12), foreground='#3333cc', background='#ccccff')
+        style.configure('h6.TLabel', font=('Elephant', 10), foreground='#0000ff', background='#ccccff')
+
+        style.configure('p.TLabel', font=('Terminal', 11), foreground='#00cc99', background='#ccccff')
+        style.configure('hr.TLabel', font=('Terminal', 11), background='#ccccff')
+        style.configure('br.TLabel', font=('Terminal', 11), background='#ccccff')
+        style.configure('span.TLabel', font=('Poor Richard', 11), foreground='#33cc33', background='#ccccff')
+        style.configure('a.TLabel', font=('Terminal', 11, 'underline'), foreground='#3366ff', background='#ccccff',
+                        cursor='circle')
 
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
@@ -117,6 +123,14 @@ class Conductor(Context):
             page_frame.grid(row=1, column=0, sticky=tk.NSEW)
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.current_page().title)
+            for anchor in self.current_page().find_nodes('a'):
+                print(anchor)
+                print(anchor.tk_object)
+                children = list()
+                anchor.find_nodes(children, 'data')
+                href = anchor.get_attr('href')
+                for child in children:
+                    child.tk_object.bind("<Button-1>", lambda event: self.go_to_page(href))
             print(serialiser.bytes_from_html(self.current_page()))
         except ValueError as e:
             print(e)
