@@ -3,6 +3,7 @@ import tkinter.ttk as ttk
 
 import dom
 import serialiser
+from styleDefaults import StyleDefaults
 
 homepage = 'http://127.0.0.1:8000//testPage.html'
 
@@ -22,26 +23,38 @@ class Context:
 
         # Configure Style
         style = ttk.Style()
-        style.configure('Gaudy.TFrame', background='#ccccff')
-        style.configure('Gaudy.TButton', background='#800080', foreground='#39FF14', font=('Sans', '12', 'bold'))
-        style.configure('GaudyGo.TButton', background='#39ff14', foreground='#0000FF', font=('Sans', '12', 'bold'))
+        style.configure('Gaudy.TFrame', background=StyleDefaults.backgroundColour)
+        style.configure('Gaudy.TButton', background=StyleDefaults.backgroundColour,
+                        foreground=StyleDefaults.secondaryColour, font=('Sans', '12', 'bold'))
+        style.configure('GaudyGo.TButton', background=StyleDefaults.secondaryColour,
+                        foreground=StyleDefaults.backgroundColour, font=('Sans', '12', 'bold'))
 
         # element styles
-        style.configure('div.TLabel', font=('Georgia', 11), foreground='#ff00ff', background='#ccccff')
+        style.configure('div.TLabel', font=(StyleDefaults.primaryFont, 11), foreground=StyleDefaults.defaultColour,
+                        background=StyleDefaults.backgroundColour)
 
-        style.configure('h1.TLabel', font=('Elephant', 20), foreground='#ff00ff', background='#ccccff')
-        style.configure('h2.TLabel', font=('Elephant', 18), foreground='#cc00ff', background='#ccccff')
-        style.configure('h3.TLabel', font=('Elephant', 16), foreground='#8000ff', background='#ccccff')
-        style.configure('h4.TLabel', font=('Elephant', 14), foreground='#6600ff', background='#ccccff')
-        style.configure('h5.TLabel', font=('Elephant', 12), foreground='#3333cc', background='#ccccff')
-        style.configure('h6.TLabel', font=('Elephant', 10), foreground='#0000ff', background='#ccccff')
+        style.configure('h1.TLabel', font=('Elephant', 20), foreground=StyleDefaults.h1Colour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('h2.TLabel', font=('Elephant', 18), foreground=StyleDefaults.h2Colour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('h3.TLabel', font=('Elephant', 16), foreground=StyleDefaults.h3Colour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('h4.TLabel', font=('Elephant', 14), foreground=StyleDefaults.h4Colour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('h5.TLabel', font=('Elephant', 12), foreground=StyleDefaults.h5Colour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('h6.TLabel', font=('Elephant', 10), foreground=StyleDefaults.h6Colour,
+                        background=StyleDefaults.backgroundColour)
 
-        style.configure('p.TLabel', font=('Terminal', 11), foreground='#00cc99', background='#ccccff')
-        style.configure('hr.TLabel', font=('Terminal', 11), background='#ccccff')
-        style.configure('br.TLabel', font=('Terminal', 11), background='#ccccff')
-        style.configure('span.TLabel', font=('Poor Richard', 11), foreground='#33cc33', background='#ccccff')
-        style.configure('a.TLabel', font=('Terminal', 11, 'underline'), foreground='#3366ff', background='#ccccff',
-                        cursor='circle')
+        style.configure('p.TLabel', font=(StyleDefaults.primaryFont, 11), foreground=StyleDefaults.primaryColour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('hr.TLabel', font=(StyleDefaults.primaryFont, 11), foreground=StyleDefaults.primaryColour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('br.TLabel', font=(StyleDefaults.primaryFont, 11), background=StyleDefaults.backgroundColour)
+        style.configure('span.TLabel', font=(StyleDefaults.primaryFont, 11), foreground='#39FF14',
+                        background=StyleDefaults.backgroundColour)
+        style.configure('a.TLabel', font=(StyleDefaults.primaryFont, 11, 'underline'), foreground='##0085FF',
+                        background='#800080')
 
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
@@ -121,8 +134,8 @@ class Conductor(Context):
             self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
             self.window.title(self.current_page().title)
             for anchor in self.current_page().find_nodes('a'):
-                print(anchor)
-                print(anchor.tk_object)
+                # print(anchor)
+                # print(anchor.tk_object)
                 children = list()
                 anchor.find_nodes(children, 'data')
                 href = anchor.get_attr('href')

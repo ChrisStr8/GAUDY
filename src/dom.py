@@ -95,7 +95,7 @@ class SpanNode(HtmlNode):
 class ANode(HtmlNode):
     def add_tk(self, parent, style):
         self.tk_object = super().add_tk(parent, 'a.TLabel')
-        self.tk_object.configure(cursor='circle')
+        self.tk_object.configure(cursor='hand2')
         return self.tk_object
 
     def a_clicked(self):
