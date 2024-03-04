@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <title>Internal API</title>
+    <meta name="author" content="Stuart Bassett">
+</head>
+<body>
+
+<section>
+    <h1>Context API</h1>
+
+    <h2>Context Class</h2>
+    <p>
+        Context serves as the parent to Conductor and Collaborator, and handles the shared behavior,
+        such as initialising styles and creating the top-level window.
+    </p>
+
+    <h3>Properties</h3>
+    <p><em>cid:</em> The context identifier.</p>
+    <p><em>pages:</em> The list of visible pages, only one is supported for now.</p>
+    <p><em>window:</em> The top-level Tk window.</p>
+    <p><em>root:</em> The root frame used for laying out the window.</p>
+    <p><em>focused_page</em> Index of currently visible page.</p>
+    
+    <h3>Methods</h3>
+    <p><em>Context(cid):</em> Creates a new context, including a window and root frame.</p>
+    <p><em>make_ui_frame():</em> Creates the user interface widgets for this frame.</p>
+
+    <h2>Collaborator Class</h2>
+    <p>
+        Collaborator is a specialisation of Context. It is not yet implemented.
+    </p>
+
+    <h2>Conductor Class</h2>
+    <p>
+        Conductor is a specialisation of Context. It is used by users who browse by themselves or host a shared session.
+    </p>
+
+    <h3>Methods</h3>
+    <p><em>Conductor(cid):</em> Create a new Conductor. Loads the homepage automatically.</p>
+    <p><em>make_ui_frame():</em> Creates the user interface for the conductor, which includes navigation buttons
+        and an address entry field.</p>
+    <p><em>go_to_page(url):</em> Download a page and display it using the DOM API.</p>
+    <p><em>display_collaboration_options():</em> Displays a window which will let users set sharing options.
+        Not ready yet.</p>
+    <p><em>go(url):</em> Add the url to the history and navigate to it.</p>
+    <p><em>back()/forward():</em> Navigate to previously visited pages.</p>
+    <p><em>current_page():</em> Retrieve the currently visible page.</p>
+</section>
+
+</body>
+</html>
