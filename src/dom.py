@@ -45,7 +45,10 @@ class HtmlNode:
         # print('node')
         frame = ttk.Frame(parent, style=style)
         for child in self.children:
-            child.add_tk(frame, style)
+            s = style
+            if child.tag is 'data' and not re.match(r'.*TLabel', s):
+                s = 'p.TLabel'
+            child.add_tk(frame, s)
         frame.grid(stick=tk.W)
         self.tk_object = frame
         return frame

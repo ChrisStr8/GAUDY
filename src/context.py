@@ -25,36 +25,48 @@ class Context:
         style = ttk.Style()
         style.configure('Gaudy.TFrame', background=StyleDefaults.backgroundColour)
         style.configure('Gaudy.TButton', background=StyleDefaults.backgroundColour,
-                        foreground=StyleDefaults.secondaryColour, font=('Sans', '12', 'bold'))
-        style.configure('GaudyGo.TButton', background=StyleDefaults.secondaryColour,
-                        foreground=StyleDefaults.backgroundColour, font=('Sans', '12', 'bold'))
+                        foreground=StyleDefaults.secondaryColour, font=('Sans', 12, 'bold'))
+        style.configure('GaudyGo.TButton', background=StyleDefaults.primaryColour,
+                        foreground=StyleDefaults.backgroundColour, font=('Sans', 12, 'bold'))
 
         # element styles
-        style.configure('div.TLabel', font=(StyleDefaults.primaryFont, 11), foreground=StyleDefaults.defaultColour,
+        style.configure('div.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
+                        foreground=StyleDefaults.defaultColour,
                         background=StyleDefaults.backgroundColour)
 
-        style.configure('h1.TLabel', font=('Elephant', 20), foreground=StyleDefaults.h1Colour,
+        style.configure('h1.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h1FontSize),
+                        foreground=StyleDefaults.h1Colour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('h2.TLabel', font=('Elephant', 18), foreground=StyleDefaults.h2Colour,
+        style.configure('h2.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h2FontSize),
+                        foreground=StyleDefaults.h2Colour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('h3.TLabel', font=('Elephant', 16), foreground=StyleDefaults.h3Colour,
+        style.configure('h3.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h3FontSize),
+                        foreground=StyleDefaults.h3Colour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('h4.TLabel', font=('Elephant', 14), foreground=StyleDefaults.h4Colour,
+        style.configure('h4.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h4FontSize),
+                        foreground=StyleDefaults.h4Colour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('h5.TLabel', font=('Elephant', 12), foreground=StyleDefaults.h5Colour,
+        style.configure('h5.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h5FontSize),
+                        foreground=StyleDefaults.h5Colour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('h6.TLabel', font=('Elephant', 10), foreground=StyleDefaults.h6Colour,
+        style.configure('h6.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h6FontSize),
+                        foreground=StyleDefaults.h6Colour,
                         background=StyleDefaults.backgroundColour)
 
-        style.configure('p.TLabel', font=(StyleDefaults.primaryFont, 11), foreground=StyleDefaults.primaryColour,
+        style.configure('p.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
+                        foreground=StyleDefaults.primaryColour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('hr.TLabel', font=(StyleDefaults.primaryFont, 11), foreground=StyleDefaults.primaryColour,
+        style.configure('hr.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
+                        foreground=StyleDefaults.primaryColour,
                         background=StyleDefaults.backgroundColour)
-        style.configure('br.TLabel', font=(StyleDefaults.primaryFont, 11), background=StyleDefaults.backgroundColour)
-        style.configure('span.TLabel', font=(StyleDefaults.primaryFont, 11), foreground='#39FF14',
+        style.configure('br.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
                         background=StyleDefaults.backgroundColour)
-        style.configure('a.TLabel', font=(StyleDefaults.primaryFont, 11, 'underline'), foreground='##0085FF',
-                        background='#800080')
+        style.configure('span.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.importantFontSize),
+                        foreground='#39FF14',
+                        background=StyleDefaults.backgroundColour)
+        style.configure('a.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize, 'underline'),
+                        foreground=StyleDefaults.primaryColour,
+                        background=StyleDefaults.backgroundColour)
 
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)

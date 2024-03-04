@@ -14,3 +14,13 @@ class StyleDefaults:
     h6Colour = '#CC00FF'
 
     primaryFont = 'Segoe Print'
+    headingFont = 'Elephant'
+    defaultFontSize = 14
+    importantFontSize = 16
+
+    h1FontSize = 24
+    h2FontSize = 20
+    h3FontSize = 18
+    h4FontSize = 16
+    h5FontSize = 16
+    h6FontSize = 16
