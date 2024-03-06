@@ -1,9 +1,12 @@
+import os
 import tkinter as tk
 import tkinter.ttk as ttk
 
 import dom
 import serialiser
 from styleDefaults import StyleDefaults
+
+import sys as sys
 
 homepage = 'http://127.0.0.1:8000//testPage.html'
 
@@ -140,7 +143,7 @@ class Conductor(Context):
         return ui_frame
 
     def go(self, url):
-        self.page_history.append(self.current_page().address)
+        self.page_history.append((self.current_page().address, serialiser.bytes_from_html(self.current_page())))
         self.go_to_page(url)
 
     def go_to_page(self, url):
@@ -152,7 +155,8 @@ class Conductor(Context):
 
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0, sticky=tk.NSEW)
-            self.pages[self.focused_page] = dom.HtmlPage(url, page_frame)
+            self.pages[self.focused_page] = dom.create_page_from_url(url, page_frame)
+
             self.window.title(self.current_page().title)
             for anchor in self.current_page().find_nodes('a'):
                 children = list()
@@ -160,20 +164,40 @@ class Conductor(Context):
                 for child in children:
                     (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
             self.set_label_length()
-            print(serialiser.bytes_from_html(self.current_page()))
+        except ValueError as e:
+            print(e)
+
+    def revisit(self, page_data):
+        self.address_bar.delete(0, tk.END)
+        self.address_bar.insert(0, page_data[0])
+        try:
+            self.current_page().delete()
+
+            page_frame = ttk.Frame(self.root)
+            page_frame.grid(row=1, column=0, sticky=tk.NSEW)
+            self.pages[self.focused_page] = dom.deserialise_page(page_data[1], page_frame)
+
+            self.window.title(self.current_page().title)
+            for anchor in self.current_page().find_nodes('a'):
+                children = list()
+                anchor.find_nodes(children, 'data')
+                for child in children:
+                    (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
+            self.set_label_length()
         except ValueError as e:
             print(e)
 
     def back(self):
         if len(self.page_history) > 0:
-            url = self.page_history.pop()
-            self.back_history.append(self.current_page().address)
-            self.go_to_page(url)
+            prev = self.page_history.pop()
+            self.back_history.append((self.current_page().address, serialiser.bytes_from_html(self.current_page())))
+            self.revisit(prev)
 
     def forward(self):
         if len(self.back_history) > 0:
-            url = self.back_history.pop()
-            self.go(url)
+            prev = self.back_history.pop()
+            self.page_history.append(prev)
+            self.revisit(prev)
 
     def display_collaboration_options(self):
         collab_menu = tk.Tk()

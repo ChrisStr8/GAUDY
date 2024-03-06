@@ -5,6 +5,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import re as re
 
+from src import serialiser
+
 
 class HtmlNode:
     parent = None
@@ -46,7 +48,7 @@ class HtmlNode:
         frame = ttk.Frame(parent, style=style)
         for child in self.children:
             s = style
-            if child.tag is 'data' and not re.match(r'.*TLabel', s):
+            if child.tag == 'data' and not re.match(r'.*TLabel', s):
                 s = 'p.TLabel'
             child.add_tk(frame, s)
         frame.grid(stick=tk.W)
@@ -228,9 +230,8 @@ class HtmlPage:
     scroll_canvas = None
     scroll_frame = None
 
-    def __init__(self, url, tk_frame):
+    def __init__(self, tk_frame):
         self.tk_frame = tk_frame
-        self.address = url
 
         self.scroll_canvas = tk.Canvas(self.tk_frame)
         self.scroll_frame = ttk.Frame(self.scroll_canvas, style='Gaudy.TFrame')
@@ -249,19 +250,31 @@ class HtmlPage:
         self.scroll_canvas.create_window((0, 0), window=self.scroll_frame, anchor='nw')
         self.scroll_frame.bind("<Configure>", self.function)
 
-        response = request.urlopen(url)
-
-        parser = GaudyParser()
-        parser.feed(response.read().decode("utf-8"))
+    def finish_loading(self, parser):
         self.root = parser.root
 
         title_string = ""
         title_datas = self.find_children("title", "data")
         for data in title_datas:
             title_string += data.get_attr("text")
-        self.title = url if title_string.isspace() else title_string
+        self.title = self.address if title_string.isspace() else title_string
 
         self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame')
+
+    def load_url(self, url):
+        self.address = url
+        response = request.urlopen(url)
+
+        parser = GaudyParser()
+        parser.feed(response.read().decode("utf-8"))
+
+        self.finish_loading(parser)
+
+    def load_data(self, data):
+        parser = GaudyParser()
+        hd = serialiser.HtmlDeserialiser(parser, data)
+        self.address = hd.address
+        self.finish_loading(parser)
 
     def function(self, event):
         self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"), width=1000, height=500)
@@ -289,3 +302,15 @@ class HtmlPage:
             self.tk_frame.destroy()
         if self.root is not None:
             self.root.delete()
+
+
+def create_page_from_url(url, frame):
+    page = HtmlPage(frame)
+    page.load_url(url)
+    return page
+
+
+def deserialise_page(data, frame):
+    page = HtmlPage(frame)
+    page.load_data(data)
+    return page
