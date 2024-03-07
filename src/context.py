@@ -1,4 +1,5 @@
-import os
+import select
+import socket
 import tkinter as tk
 import tkinter.ttk as ttk
 
@@ -91,11 +92,27 @@ class Conductor(Context):
         self.pages = [None]
         self.page_history = list()
         self.back_history = list()
+        self.collaborators = list()
+        self.current_page_data = None
         self.go_to_page(homepage)
 
         self.window.bind("<Configure>", lambda x: self.set_label_length())
 
+        self.window.after(10, lambda: self.check_network())
+        self.server_socket = socket.create_server(('0.0.0.0', 10000))
+
         self.window.mainloop()
+
+    def check_network(self):
+        ready = select.select([self.server_socket], [], [], 0)
+
+        if self.server_socket in ready[0]:
+            connection, address = self.server_socket.accept()
+            self.collaborators.append(connection)
+            connection.sendall(self.current_page_data)
+            connection.sendall(b'\f')
+
+        self.window.after(1000, lambda: self.check_network())
 
     def current_page(self):
         return self.pages[self.focused_page]
@@ -143,8 +160,26 @@ class Conductor(Context):
         return ui_frame
 
     def go(self, url):
-        self.page_history.append((self.current_page().address, serialiser.bytes_from_html(self.current_page())))
+        self.page_history.append((self.current_page().address, self.current_page_data))
         self.go_to_page(url)
+
+    def finish_going(self):
+        self.window.title(self.current_page().title)
+        for anchor in self.current_page().find_nodes('a'):
+            children = list()
+            anchor.find_nodes(children, 'data')
+            for child in children:
+                (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
+        self.set_label_length()
+
+        for collaborator in self.collaborators:
+            try:
+                collaborator.sendall(self.current_page_data)
+                collaborator.sendall(b'\f')
+            except IOError:
+                collaborator.close()
+                self.collaborators.remove(collaborator)
+
 
     def go_to_page(self, url):
         self.address_bar.delete(0, tk.END)
@@ -156,14 +191,9 @@ class Conductor(Context):
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0, sticky=tk.NSEW)
             self.pages[self.focused_page] = dom.create_page_from_url(url, page_frame)
+            self.current_page_data = serialiser.bytes_from_html(self.current_page())
+            self.finish_going()
 
-            self.window.title(self.current_page().title)
-            for anchor in self.current_page().find_nodes('a'):
-                children = list()
-                anchor.find_nodes(children, 'data')
-                for child in children:
-                    (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
-            self.set_label_length()
         except ValueError as e:
             print(e)
 
@@ -176,21 +206,16 @@ class Conductor(Context):
             page_frame = ttk.Frame(self.root)
             page_frame.grid(row=1, column=0, sticky=tk.NSEW)
             self.pages[self.focused_page] = dom.deserialise_page(page_data[1], page_frame)
+            self.current_page_data = page_data[1]
+            self.finish_going()
 
-            self.window.title(self.current_page().title)
-            for anchor in self.current_page().find_nodes('a'):
-                children = list()
-                anchor.find_nodes(children, 'data')
-                for child in children:
-                    (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
-            self.set_label_length()
         except ValueError as e:
             print(e)
 
     def back(self):
         if len(self.page_history) > 0:
             prev = self.page_history.pop()
-            self.back_history.append((self.current_page().address, serialiser.bytes_from_html(self.current_page())))
+            self.back_history.append((self.current_page().address, self.current_page_data))
             self.revisit(prev)
 
     def forward(self):
