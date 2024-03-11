@@ -13,8 +13,8 @@ class StyleDefaults:
     h5Colour = '#CC00EE'
     h6Colour = '#CC00FF'
 
-    primaryFont = 'Segoe Print'
-    headingFont = 'Elephant'
+    primaryFont = 'Liberation Sans'
+    headingFont = 'Liberation Serif'
     defaultFontSize = 14
     importantFontSize = 16
 

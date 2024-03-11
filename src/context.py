@@ -1,17 +1,15 @@
-import select
-import socket
 import tkinter as tk
 import tkinter.ttk as ttk
 
-import dom
-import serialiser
 from styleDefaults import StyleDefaults
 
-import sys as sys
 
-
-# when changing page remember to delete the old one
 class Context:
+    """
+    Context is the base class for Conductor and Collaborator.
+    Manages top-level TK window state and has some shared utility functions.
+    """
+
     cid = None
     pages = None
     window = None
@@ -70,6 +68,7 @@ class Context:
                         foreground=StyleDefaults.primaryColour,
                         background=StyleDefaults.backgroundColour)
 
+        # Layout top-level window
         self.root = ttk.Frame(self.window, style='Gaudy.TFrame')
         self.root.grid(row=0, column=0, sticky=tk.NSEW)
         self.root.grid_columnconfigure(0, weight=1)
@@ -88,9 +87,20 @@ class Context:
         return None
 
     def set_label_length(self):
+        """
+        Configure the length of each text label when the window size changes, or a new page is loaded.
+        """
         if self.current_page() is None:
             return
         width = self.root.winfo_width() - self.current_page().scrollbar.winfo_width()
         for data in self.current_page().find_nodes('data'):
             if data.tk_object is not None:
                 data.tk_object.configure(wraplength=width)
+
+    def set_address(self, address):
+        """
+        Change the value shown in the address bar.
+        :param address: The address to show.
+        """
+        self.address_bar.delete(0, tk.END)
+        self.address_bar.insert(0, address)
