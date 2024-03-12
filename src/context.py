@@ -1,5 +1,7 @@
+import re
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.font
 
 from styleDefaults import StyleDefaults
 
@@ -21,13 +23,15 @@ class Context:
 
         self.window = tk.Tk()
 
+        print([font for font in tkinter.font.families() if re.match(r'Kalam.*', font)])
+
         # Configure Style
         style = ttk.Style()
         style.configure('Gaudy.TFrame', background=StyleDefaults.backgroundColour)
         style.configure('Gaudy.TButton', background=StyleDefaults.backgroundColour,
-                        foreground=StyleDefaults.secondaryColour, font=('Sans', 12, 'bold'))
+                        foreground=StyleDefaults.secondaryColour, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
         style.configure('GaudyGo.TButton', background=StyleDefaults.primaryColour,
-                        foreground=StyleDefaults.backgroundColour, font=('Sans', 12, 'bold'))
+                        foreground=StyleDefaults.backgroundColour, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
 
         # element styles
         style.configure('div.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),

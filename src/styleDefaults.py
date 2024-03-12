@@ -13,8 +13,9 @@ class StyleDefaults:
     h5Colour = '#CC00EE'
     h6Colour = '#CC00FF'
 
-    primaryFont = 'Liberation Sans'
-    headingFont = 'Liberation Serif'
+    primaryFont = 'Kalam'
+    headingFont = 'Permanent Marker'
+    userInterfaceFont = 'Fragment Mono'
     defaultFontSize = 14
     importantFontSize = 16
 
