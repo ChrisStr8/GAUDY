@@ -32,6 +32,7 @@ class Collaborator(Context):
 
         # Connect to Conductor
         self.conductor = socket.create_connection((host, port))
+        self.conductor.setblocking(False)
         self.buffer = bytearray()
         self.current_page_data = None
         self.page = None
@@ -56,7 +57,7 @@ class Collaborator(Context):
             while True:
                 try:
                     # Receive data from Conductor
-                    response = self.conductor.recv(4096, socket.MSG_DONTWAIT)
+                    response = self.conductor.recv(4096, 0)
                 except BlockingIOError:
                     # End of incoming data
                     break

@@ -41,6 +41,7 @@ class Conductor(Context):
 
         # Prepare to accept collaborators.
         self.server_socket = socket.create_server(('0.0.0.0', 10000))
+        self.server_socket.setblocking(False)
         self.window.after(10, lambda: self.check_network())
 
         # Start the application
