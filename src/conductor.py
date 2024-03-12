@@ -155,7 +155,8 @@ class Conductor(Context):
                 # Without this ALL links on the page will go to the same place.
                 # This is because the child reference is changed, with the nested lambda using the same binding.
                 # If you know a better way to do this, please tell Stuart :)
-                (lambda c=child: c.tk_object.bind("<Button-1>", lambda event: self.go(c.parent.get_attr('href'))))()
+                (lambda c=child: c.tk_object.bind("<Button-1>",
+                                                  lambda event: self.go(self.make_path(c.parent.get_attr('href')))))()
 
         # Fit labels into the frame
         self.set_label_length()
@@ -169,6 +170,15 @@ class Conductor(Context):
                 # Connection lost - remove collaborator from list.
                 collaborator[0].close()
                 self.collaborators.remove(collaborator)
+
+    def make_path(self, url):
+        if '://' in url:
+            return url
+
+        addr = self.current_page().address
+        before, sep, after = addr.rpartition('/')
+
+        return before + '/' + url
 
     def go_to_page(self, url):
         """
