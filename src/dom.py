@@ -70,11 +70,13 @@ class HtmlNode:
                 return a[1]
         return None
 
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         """
         Add a Tk frame to represent this tag.
         :param parent: The Parent Tk frame.
         :param style: The style string to use.
+        :param indent: an int denoting the level of indentation
+        :param dot: the character to use for list elements
         :return: The frame added.
         """
 
@@ -85,7 +87,7 @@ class HtmlNode:
             s = style
             if child.tag == 'data' and not re.match(r'.*TLabel', s):
                 s = 'p.TLabel'
-            child.add_tk(frame, s)
+            child.add_tk(frame, s, indent, dot)
 
         frame.grid(sticky=tk.W)
         self.tk_object = frame
@@ -100,17 +102,18 @@ class HtmlNode:
             child.delete()
         self.children = list()
 
+
 # Following are specialisations of HtmlNode
 
 
 class HeadNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Don't render any children of <head>
         pass
 
 
 class TitleNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Don't render any children of <title>
         return None
 
@@ -120,21 +123,21 @@ class BodyNode(HtmlNode):
 
 
 class DivNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'div.TLabel')
+        return super().add_tk(parent, 'div.TLabel', indent, dot)
 
 
 class SpanNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'span.TLabel')
+        return super().add_tk(parent, 'span.TLabel', indent, dot)
 
 
 class ANode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Call HtmlNode.add_tk with alternate style.
-        super().add_tk(parent, 'a.TLabel')
+        super().add_tk(parent, 'a.TLabel', indent, dot)
 
         # Set cursor to pointing hand when hovering over a link.
         self.tk_object.configure(cursor='hand2')
@@ -146,9 +149,9 @@ class TableNode(HtmlNode):
 
 
 class PNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'p.TLabel')
+        return super().add_tk(parent, 'p.TLabel', indent, dot)
 
 
 class PreNode(HtmlNode):
@@ -159,6 +162,7 @@ class HNode(HtmlNode):
     """
     All heading levels (h1 - h6) use this class.
     """
+
     def __init__(self, parent, tag, attrs, h_level):
         """
         Create a heading node with given level (1 - 6)
@@ -170,13 +174,13 @@ class HNode(HtmlNode):
         super().__init__(parent, tag, attrs)
         self.h_level = h_level
 
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Call HtmlNode.add_tk with correct heading style
-        return super().add_tk(parent, f'h{self.h_level}.TLabel')
+        return super().add_tk(parent, f'h{self.h_level}.TLabel', indent, dot)
 
 
 class HrNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Draw a Horizontal Line
         line_break = ttk.Label(parent, text='--------------------------------\n', style='hr.TLabel')
         line_break.grid(stick=tk.W)
@@ -184,7 +188,7 @@ class HrNode(HtmlNode):
 
 
 class BrNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Force a line break
         line_break = ttk.Label(parent, text='\n', style='br.TLabel')
         line_break.grid(stick=tk.W)
@@ -192,7 +196,7 @@ class BrNode(HtmlNode):
 
 
 class ImgNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         img = ImageTk.PhotoImage(Image.open("C:\\Users\\christopher.straight\\PycharmProjects\\gaudy\\icons\\icons8"
                                             "-unavailable-48.png"))
         panel = ttk.Label(parent, image=img)
@@ -200,11 +204,16 @@ class ImgNode(HtmlNode):
         return panel
 
 
+class UlNode(HtmlNode):
+    def add_tk(self, parent, style, indent, dot):
+        return super().add_tk(parent, style, indent + '\t', '•')
+
+
 class DataNode(HtmlNode):
-    def add_tk(self, parent, style):
+    def add_tk(self, parent, style, indent, dot):
         # Create a label with the node's text
         self.attrs.append(('style', style))
-        label = ttk.Label(parent, text=self.get_attr("text"), style=style)
+        label = ttk.Label(parent, text=(indent + dot + self.get_attr("text")), style=style)
         self.tk_object = label
         label.grid(stick=tk.W)
         return label
@@ -272,6 +281,8 @@ class GaudyParser(HTMLParser):
             node = ImgNode(self.parent, tag, attrs)
         elif tag == 'data':
             node = DataNode(self.parent, tag, attrs)
+        elif tag == 'ul':
+            node = UlNode(self.parent, tag, attrs)
         else:
             node = HtmlNode(self.parent, tag, attrs)
 
@@ -369,7 +380,7 @@ class HtmlPage:
         self.title = self.address if title_string.isspace() else title_string
 
         # Draw the page by creating Tk controls for each tag.
-        self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame')
+        self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
 
     def load_url(self, url):
         """

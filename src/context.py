@@ -27,11 +27,19 @@ class Context:
 
         # Configure Style
         style = ttk.Style()
+        style.theme_use('clam')
         style.configure('Gaudy.TFrame', background=StyleDefaults.backgroundColour)
         style.configure('Gaudy.TButton', background=StyleDefaults.backgroundColour,
                         foreground=StyleDefaults.secondaryColour, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
+        style.map('Gaudy.TButton',
+                  background=[('active', StyleDefaults.defaultColour), ('!disabled', StyleDefaults.accentColour1)],
+                  foreground=[('active', 'white'), ('!disabled', StyleDefaults.pale_yellow)])
+
         style.configure('GaudyGo.TButton', background=StyleDefaults.primaryColour,
-                        foreground=StyleDefaults.accentColour1, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
+                        foreground=StyleDefaults.deep_green, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
+        style.map('GaudyGo.TButton',
+                  background=[('active', StyleDefaults.bright_magenta), ('!disabled', StyleDefaults.deep_green)],
+                  foreground=[('active', 'white'), ('!disabled', StyleDefaults.pale_yellow)])
 
         # element styles
         style.configure('div.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),

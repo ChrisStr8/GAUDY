@@ -42,6 +42,16 @@ class StyleDefaults:
     backgroundColour = '#ccccff'  # pale_blue  # '#800080'
     link_colour = '#0000EE'
 
+    dark_mode = False
+    if dark_mode:
+        defaultColour = '#B4D9C8'
+        primaryColour = '#D154FF'
+        secondaryColour = '#1D593E'
+        accentColour1 = '#D9CDB4'
+        accentColour2 = '#CF8D00'
+        backgroundColour = '#471D59'
+        link_colour = '#00A1ED'
+
     h1Colour = '#CC00AA'
     h2Colour = '#e60066'
     h3Colour = '#d93823'
