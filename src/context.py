@@ -31,7 +31,7 @@ class Context:
         style.configure('Gaudy.TButton', background=StyleDefaults.backgroundColour,
                         foreground=StyleDefaults.secondaryColour, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
         style.configure('GaudyGo.TButton', background=StyleDefaults.primaryColour,
-                        foreground=StyleDefaults.backgroundColour, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
+                        foreground=StyleDefaults.accentColour1, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
 
         # element styles
         style.configure('div.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
@@ -66,10 +66,10 @@ class Context:
         style.configure('br.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
                         background=StyleDefaults.backgroundColour)
         style.configure('span.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.importantFontSize),
-                        foreground='#39FF14',
+                        foreground=StyleDefaults.accentColour2,
                         background=StyleDefaults.backgroundColour)
         style.configure('a.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize, 'underline'),
-                        foreground=StyleDefaults.primaryColour,
+                        foreground=StyleDefaults.link_colour,
                         background=StyleDefaults.backgroundColour)
 
         # Layout top-level window

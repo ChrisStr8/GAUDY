@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 
 import tkinter as tk
 import tkinter.ttk as ttk
+from PIL import ImageTk, Image
 import re as re
 
 from src import serialiser
@@ -191,7 +192,12 @@ class BrNode(HtmlNode):
 
 
 class ImgNode(HtmlNode):
-    pass
+    def add_tk(self, parent, style):
+        img = ImageTk.PhotoImage(Image.open("C:\\Users\\christopher.straight\\PycharmProjects\\gaudy\\icons\\icons8"
+                                            "-unavailable-48.png"))
+        panel = ttk.Label(parent, image=img)
+        panel.grid()
+        return panel
 
 
 class DataNode(HtmlNode):
