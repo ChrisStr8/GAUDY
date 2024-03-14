@@ -4,11 +4,10 @@ import dom
 
 import socket
 import select
+import re
 
 import tkinter as tk
 import tkinter.ttk as ttk
-
-HOMEPAGE = 'http://127.0.0.1:8000/image.html'
 
 
 class Conductor(Context):
@@ -16,7 +15,7 @@ class Conductor(Context):
     Conductor class loads pages from the internet and sends them to collaborators.
     """
 
-    def __init__(self, cid):
+    def __init__(self, cid, home):
         """
         Create a Conductor. It will automatically load the homepage.
         :param cid: The Context Name
@@ -37,7 +36,7 @@ class Conductor(Context):
         self.current_page_data = None
 
         # Navigate to the homepage
-        self.go_to_page(HOMEPAGE)
+        self.go_to_page(home)
 
         # Prepare to accept collaborators.
         self.server_socket = socket.create_server(('0.0.0.0', 10000))
@@ -96,7 +95,6 @@ class Conductor(Context):
 
         # Create address entry
         address = tk.StringVar()
-        address.set(HOMEPAGE)
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
         # Create 'Go!' button
@@ -172,7 +170,7 @@ class Conductor(Context):
                 self.collaborators.remove(collaborator)
 
     def make_path(self, url):
-        if '://' in url:
+        if re.match(r'\w*:.*', url):
             return url
 
         addr = self.current_page().address

@@ -213,10 +213,10 @@ class ImgNode(HtmlNode):
         self.url = url
 
     def make_path(self, image_path):
-        if '://' in image_path:
+        if re.match(r'\w*:.*', image_path):
             return image_path
 
-        addr = self.url.address
+        addr = self.url
         before, sep, after = addr.rpartition('/')
 
         return before + '/' + image_path
@@ -225,13 +225,16 @@ class ImgNode(HtmlNode):
         if self.url is not None:
             src = self.get_attr('src')
             try:
-                response = request.urlopen(src)
+                response = request.urlopen(self.make_path(src))
                 self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
             except HTTPException or URLError:
                 pass
 
         if self.get_attr('data') is not None:
-            self.image = tk.PhotoImage(data=base64.b64decode(self.get_attr('data')))
+            try:
+                self.image = tk.PhotoImage(data=base64.b64decode(self.get_attr('data')))
+            except tk.TclError:
+                pass
 
         if self.image is None:
             self.image = tk.PhotoImage(file="icons/icons8-unavailable-48.png")
