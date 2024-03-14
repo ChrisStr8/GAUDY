@@ -8,7 +8,7 @@ import select
 import tkinter as tk
 import tkinter.ttk as ttk
 
-HOMEPAGE = 'http://127.0.0.1:8000/testPage.html'
+HOMEPAGE = 'http://127.0.0.1:8000/image.html'
 
 
 class Conductor(Context):

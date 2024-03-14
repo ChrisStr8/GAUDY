@@ -197,9 +197,8 @@ class BrNode(HtmlNode):
 
 class ImgNode(HtmlNode):
     def add_tk(self, parent, style, indent, dot):
-        img = ImageTk.PhotoImage(Image.open("C:\\Users\\christopher.straight\\PycharmProjects\\gaudy\\icons\\icons8"
-                                            "-unavailable-48.png"))
-        panel = ttk.Label(parent, image=img)
+        self.img = tk.PhotoImage(file="icons/icons8-unavailable-48.png")
+        panel = ttk.Label(parent, image=self.img)
         panel.grid()
         return panel
 
@@ -345,6 +344,8 @@ class HtmlPage:
 
         # Create top-level components - Canvas, Scrollbar, and Frame
         self.scroll_canvas = tk.Canvas(self.tk_frame)
+        img = ImageTk.PhotoImage(Image.open('icons/bingus.png'))
+
         self.scroll_frame = ttk.Frame(self.scroll_canvas, style='Gaudy.TFrame')
         self.scrollbar = tk.Scrollbar(self.tk_frame, orient="vertical", command=self.scroll_canvas.yview)
 
