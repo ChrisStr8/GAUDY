@@ -3,7 +3,6 @@ from html.parser import HTMLParser
 
 import tkinter as tk
 import tkinter.ttk as ttk
-from PIL import ImageTk, Image
 import re as re
 
 from src import serialiser
@@ -70,6 +69,11 @@ class HtmlNode:
                 return a[1]
         return None
 
+    def clear_attr(self, attr):
+        for a in self.attrs:
+            if a[0] == attr:
+                self.attrs.remove(a)
+
     def add_tk(self, parent, style, indent, dot):
         """
         Add a Tk frame to represent this tag.
@@ -101,7 +105,6 @@ class HtmlNode:
         for child in self.children:
             child.delete()
         self.children = list()
-
 
 # Following are specialisations of HtmlNode
 
@@ -155,7 +158,9 @@ class PNode(HtmlNode):
 
 
 class PreNode(HtmlNode):
-    pass
+    def add_tk(self, parent, style, indent, dot):
+        # Call HtmlNode.add_tk with alternate style
+        return super().add_tk(parent, 'pre.TLabel', indent, dot)
 
 
 class HNode(HtmlNode):
@@ -182,7 +187,7 @@ class HNode(HtmlNode):
 class HrNode(HtmlNode):
     def add_tk(self, parent, style, indent, dot):
         # Draw a Horizontal Line
-        line_break = ttk.Label(parent, text='--------------------------------\n', style='hr.TLabel')
+        line_break = ttk.Label(parent, text='--------------------------------', style='hr.TLabel')
         line_break.grid(stick=tk.W)
         return line_break
 
@@ -190,7 +195,7 @@ class HrNode(HtmlNode):
 class BrNode(HtmlNode):
     def add_tk(self, parent, style, indent, dot):
         # Force a line break
-        line_break = ttk.Label(parent, text='\n', style='br.TLabel')
+        line_break = ttk.Label(parent, text='', style='br.TLabel')
         line_break.grid(stick=tk.W)
         return line_break
 
@@ -217,6 +222,11 @@ class DataNode(HtmlNode):
         label.grid(stick=tk.W)
         return label
 
+    def append(self, text):
+        new_text = self.get_attr('text') + text
+        self.clear_attr('text')
+        self.attrs.append(('text', new_text))
+
 
 def is_void(tag):
     """
@@ -241,6 +251,15 @@ class GaudyParser(HTMLParser):
 
     # Current parent node to which children are being added.
     parent = None
+
+    def last_child(self):
+        if len(self.parent.children) == 0:
+            return None
+        else:
+            return self.parent.children[-1]
+
+    def match_last_child(self, tag):
+        return self.last_child() is not None and self.last_child().tag == tag
 
     def handle_starttag(self, tag, attrs):
         """
@@ -275,7 +294,11 @@ class GaudyParser(HTMLParser):
         elif tag == 'hr':
             node = HrNode(self.parent, tag, attrs)
         elif tag == 'br':
-            node = BrNode(self.parent, tag, attrs)
+            # Don't insert a new node for br between data
+            if self.match_last_child('data'):
+                self.last_child().append('\n')
+            else:
+                node = BrNode(self.parent, tag, attrs)
         elif tag == 'img':
             node = ImgNode(self.parent, tag, attrs)
         elif tag == 'data':
@@ -284,6 +307,9 @@ class GaudyParser(HTMLParser):
             node = UlNode(self.parent, tag, attrs)
         else:
             node = HtmlNode(self.parent, tag, attrs)
+
+        if node is None:
+            return
 
         # Add the new node to the parent (if it is not the top-level node)
         if self.parent is not None:
@@ -320,10 +346,14 @@ class GaudyParser(HTMLParser):
             # Replace sequences of whitespace characters in data with a single blank.
             data = re.sub(r'\s+', ' ', data)
 
-            # Call handle_starttag and handle_endtag to create the data node.
-            # The node is given an attribute 'text' which contains the data.
-            self.handle_starttag("data", [("text", data)])
-            self.handle_endtag("data")
+            if self.match_last_child('data'):
+                # Multiple sequential data nodes (this can occur after br tags in some cases)
+                self.last_child().append(data)
+            else:
+                # Call handle_starttag and handle_endtag to create the data node.
+                # The node is given an attribute 'text' which contains the data.
+                self.handle_starttag("data", [("text", data)])
+                self.handle_endtag("data")
 
 
 class HtmlPage:
@@ -344,8 +374,6 @@ class HtmlPage:
 
         # Create top-level components - Canvas, Scrollbar, and Frame
         self.scroll_canvas = tk.Canvas(self.tk_frame)
-        img = ImageTk.PhotoImage(Image.open('icons/bingus.png'))
-
         self.scroll_frame = ttk.Frame(self.scroll_canvas, style='Gaudy.TFrame')
         self.scrollbar = tk.Scrollbar(self.tk_frame, orient="vertical", command=self.scroll_canvas.yview)
 

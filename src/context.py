@@ -42,8 +42,8 @@ class Context:
                   foreground=[('active', StyleDefaults.bright_yellow), ('!disabled', StyleDefaults.pale_yellow)])
 
         # element styles
-        style.configure('div.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
-                        foreground=StyleDefaults.defaultColour,
+        style.configure('div.TLabel', font=(StyleDefaults.userInterfaceFont, StyleDefaults.defaultFontSize),
+                        foreground=StyleDefaults.primaryColour,
                         background=StyleDefaults.backgroundColour)
 
         style.configure('h1.TLabel', font=(StyleDefaults.headingFont, StyleDefaults.h1FontSize),
@@ -73,11 +73,14 @@ class Context:
                         background=StyleDefaults.backgroundColour)
         style.configure('br.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
                         background=StyleDefaults.backgroundColour)
-        style.configure('span.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.importantFontSize),
+        style.configure('span.TLabel', font=(StyleDefaults.serifFont, StyleDefaults.importantFontSize),
                         foreground=StyleDefaults.accentColour2,
                         background=StyleDefaults.backgroundColour)
         style.configure('a.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize, 'underline'),
                         foreground=StyleDefaults.link_colour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('pre.TLabel', font=(StyleDefaults.monospaceFont, StyleDefaults.defaultFontSize),
+                        foreground=StyleDefaults.primaryColour,
                         background=StyleDefaults.backgroundColour)
 
         # Layout top-level window

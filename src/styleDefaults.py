@@ -60,8 +60,11 @@ class StyleDefaults:
     h6Colour = '#009905'
 
     primaryFont = 'Kalam'
+    sansFont = primaryFont
     headingFont = 'Permanent Marker'
     userInterfaceFont = 'Fragment Mono'
+    serifFont = 'Kurale'
+    monospaceFont = 'Kode Mono'
     defaultFontSize = 14
     importantFontSize = 16
 

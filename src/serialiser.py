@@ -312,11 +312,11 @@ class Deserialiser:
         self.expect(expected)
 
         # Read until a value < 0x20 (space) is encountered.
-        object_name = bytearray()
-        while self.peek()[0] >= 0x20:
-            object_name.append(self.read()[0])
+        text = bytearray()
+        while self.peek()[0] == 0x0a or self.peek()[0] >= 0x20:
+            text.append(self.read()[0])
 
-        return object_name.decode('utf-8')
+        return text.decode('utf-8')
 
     def expect(self, value: bytes):
         """
