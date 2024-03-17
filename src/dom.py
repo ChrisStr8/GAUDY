@@ -11,7 +11,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import re as re
 
-from src import serialiser
+import serialiser
 
 
 class HtmlNode:
@@ -458,7 +458,7 @@ class HtmlPage:
             top.bind_class('scrolly', '<Button-5>',
                                lambda e: self.scroll_canvas.yview_scroll(1, 'units'))
         else:
-            top.bind_class('scrolly', '<MouseWheel>', lambda e: self.scroll_canvas.yview_scroll(e.delta, 'units'))
+            top.bind_class('scrolly', '<MouseWheel>', lambda e: self.scroll_canvas.yview_scroll(int(e.delta / -60), 'units'))
 
     def finish_loading(self, parser):
         """
