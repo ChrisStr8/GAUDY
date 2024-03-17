@@ -153,8 +153,8 @@ class Conductor(Context):
                 # Without this ALL links on the page will go to the same place.
                 # This is because the child reference is changed, with the nested lambda using the same binding.
                 # If you know a better way to do this, please tell Stuart :)
-                (lambda c=child: c.tk_object.bind("<Button-1>",
-                                                  lambda event: self.go(self.make_path(c.parent.get_attr('href')))))()
+                (lambda c=child, a=anchor: c.tk_object.bind("<Button-1>",
+                                                  lambda event: self.go(self.make_path(a.get_attr('href')))))()
 
         # Fit labels into the frame
         self.set_label_length()
@@ -170,13 +170,30 @@ class Conductor(Context):
                 self.collaborators.remove(collaborator)
 
     def make_path(self, url):
-        if re.match(r'\w*:.*', url):
-            return url
-
         addr = self.current_page().address
-        before, sep, after = addr.rpartition('/')
+        proto, _, path = addr.partition('://')
 
-        return before + '/' + url
+        # Ignore any fragment
+        if url[0] == '#':
+            # Fragment relative to current page - reload the page
+            return addr
+
+        # Strip fragment
+        frag_pos = url.find('#')
+        if frag_pos != -1:
+            url = url[0:frag_pos]
+
+        if re.match(r'\w*:.*', url):
+            # Full url
+            return url
+        elif url[0] == '/':
+            # Absolute path
+            before, sep, after = path.partition('/')
+            return proto + '://' + before + url
+        else:
+            # Relative path
+            before, sep, after = path.rpartition('/')
+            return proto + '://' + before + '/' + url
 
     def go_to_page(self, url):
         """

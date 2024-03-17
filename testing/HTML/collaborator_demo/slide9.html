@@ -6,23 +6,38 @@
 </head>
 <body>
 <h1>Technology & Implementation</h1>
+<ul>
+    <li>Python 3</li>
+    <li>Tkinter</li>
+    <li>urllib</li>
+    <li>socket</li>
+    <li>HTML</li>
+</ul>
+
+<h2>Python</h2>
 <p>
-    This proof of concept was built using Python3 with the Tkinter module. Python is good for prototypes as it has
-    a large number of useful features out of the box. Tkinter is one of these. It is Python's interface for TCL/TK,
-    a cross-platform toolkit for building GUI applications. It's responsible for all the text labels, buttons,
-    and other interface components.
+    Python is good for prototyping due to the large amount of features in the base library. This makes it easy to
+    create useful programs, although the performance is often sub-par.
 </p>
-<br />
+<h2>Tkinter</h2>
 <p>
-    The urllib module is being used to download HTML documents from the internet. It supports securely connecting
-    to websites via HTTPS, so we can browse the web safely. When a page is loaded we create Tkinter elements for
-    the page text.
+    Tkinter is Python's interface for TCL/TK, a cross-platform system for building graphical user interfaces.
+    It is responsible for handling the window, page layout, buttons, and text fields.
 </p>
-<br />
+<h2>urllib</h2>
 <p>
-    Finally, we used the socket module to handle the connection between collaborator and conductor. This module lets
-    us establish TCP connections and send data. These connections aren't encrypted in this proof of concept,
-    so we don't recommend connecting over the internet!
+    This is another Python module that makes it easy to send requests to web servers. We use this to connect to
+    websites and download pages.
+</p>
+<h2>socket</h2>
+<p>
+    We also use Python's socket module, which is a thin wrapper around the operating system socket interface for
+    communicating with the network adaptor. This allows us to connect the conductor and collaborator.
+</p>
+<h2>HTML</h2>
+<p>
+    We handle pages in the HyperText Markup Language, more commonly known as HTML. (Almost) all websites use this format
+    to represent documents or web-pages. This proof of concept does not support all of HTML, only a limited subset.
 </p>
 <a href="slide10.html">Continue</a>
 </body>

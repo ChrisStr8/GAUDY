@@ -7,19 +7,19 @@
 <body>
 <h1>Connectivity</h1>
 <p>
-    GAUDY is designed to use a peer-to-peer architecture. Conductors and collaborators can establish a shared
+    GAUDY uses a peer-to-peer architecture. Conductors and collaborators can establish a shared
     session without needing a central authority.
 </p>
 <br />
 <p>
-    Only the conductor is responsible for downloading web pages. When it loads a document, it converts the HTML
-    to an internal representation and sends it each of the collaborators. Collaborators can only send and receive
-    from the conductor.
+    Only the conductor is responsible for downloading web pages. When it loads a document, it converts the HTML to an
+    internal representation and sends it to each collaborator. Collaborators communicate only with the conductor.
 </p>
 <br />
 <p>
     In this proof of concept only the conductor may issue commands. In the future we plan to also allow collaborators
-    to activate links, fill out forms, and otherwise control the browsing session.
+    to activate links, fill out forms, and otherwise control the browsing session. The conductor would relay all of
+    this activity to other collaborators.
 </p>
 <a href="slide11.html">Finish</a>
 </body>

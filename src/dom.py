@@ -1,5 +1,6 @@
+import sys
 from urllib import request
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 from html.parser import HTMLParser
 
 import base64
@@ -213,22 +214,29 @@ class ImgNode(HtmlNode):
         self.url = url
 
     def make_path(self, image_path):
+        proto, _, path = self.url.partition('://')
         if re.match(r'\w*:.*', image_path):
+            # Full url
             return image_path
-
-        addr = self.url
-        before, sep, after = addr.rpartition('/')
-
-        return before + '/' + image_path
+        elif image_path[0] == '/':
+            # Absolute path
+            before, sep, after = path.partition('/')
+            return proto + '://' + before + image_path
+        else:
+            # Relative path
+            before, sep, after = path.rpartition('/')
+            return proto + '://' + before + '/' + image_path
 
     def add_tk(self, parent, style, indent, dot):
         if self.url is not None:
             src = self.get_attr('src')
+            path = self.make_path(src)
+            print(path)
             try:
-                response = request.urlopen(self.make_path(src))
+                response = request.urlopen(path)
                 self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
-            except HTTPException or URLError:
-                pass
+            except (HTTPError or URLError) as e:
+                print(path, e)
 
         if self.get_attr('data') is not None:
             try:
@@ -247,6 +255,12 @@ class ImgNode(HtmlNode):
 class UlNode(HtmlNode):
     def add_tk(self, parent, style, indent, dot):
         return super().add_tk(parent, style, indent + '\t', '•')
+
+
+class BlockquoteNode(HtmlNode):
+    def add_tk(self, parent, style, indent, dot):
+        # Call HtmlNode.add_tk with alternate style
+        return super().add_tk(parent, 'blockquote.TLabel', indent, dot)
 
 
 class DataNode(HtmlNode):
@@ -345,6 +359,8 @@ class GaudyParser(HTMLParser):
             node = DataNode(self.parent, tag, attrs)
         elif tag == 'ul':
             node = UlNode(self.parent, tag, attrs)
+        elif tag == 'blockquote':
+            node = BlockquoteNode(self.parent, tag, attrs)
         else:
             node = HtmlNode(self.parent, tag, attrs)
 
@@ -429,6 +445,20 @@ class HtmlPage:
         self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scroll_canvas.create_window((0, 0), window=self.scroll_frame, anchor='nw')
         self.scroll_frame.bind("<Configure>", self.configure_scroll_frame)
+        self.setup_mouse_wheel()
+
+    def setup_mouse_wheel(self):
+        # Bet you didn't expect this to be so hard.
+        # We have to do additional setup when the page is finished loading!
+        top = self.tk_frame.winfo_toplevel()
+        if sys.platform == 'linux':
+            # Mouse wheel is implemented as buttons 4 (up) and 5 (down)!
+            top.bind_class('scrolly', '<Button-4>',
+                                lambda e: self.scroll_canvas.yview_scroll(-1, 'units'))
+            top.bind_class('scrolly', '<Button-5>',
+                               lambda e: self.scroll_canvas.yview_scroll(1, 'units'))
+        else:
+            top.bind_class('scrolly', '<MouseWheel>', lambda e: self.scroll_canvas.yview_scroll(e.delta, 'units'))
 
     def finish_loading(self, parser):
         """
@@ -450,6 +480,12 @@ class HtmlPage:
 
         # Draw the page by creating Tk controls for each tag.
         self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
+
+        # Add the 'scrolly' tag to all child widgets, so that the mouse wheel events are handled properly
+        for node in self.find_nodes(None):
+            widget = node.tk_object
+            if node.tk_object is not None:
+                widget.bindtags(('scrolly',) + widget.bindtags())
 
     def load_url(self, url):
         """
@@ -496,7 +532,7 @@ class HtmlPage:
     def find_nodes(self, selector):
         """
         Find all nodes on the page matching selector.
-        Selector is a tag name.
+        Selector is a tag name, or None for all nodes
         :param selector: The selector to match
         :return: A list of matching nodes.
         """

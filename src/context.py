@@ -73,7 +73,7 @@ class Context:
                         background=StyleDefaults.backgroundColour)
         style.configure('br.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize),
                         background=StyleDefaults.backgroundColour)
-        style.configure('span.TLabel', font=(StyleDefaults.serifFont, StyleDefaults.importantFontSize),
+        style.configure('span.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.importantFontSize),
                         foreground=StyleDefaults.accentColour2,
                         background=StyleDefaults.backgroundColour)
         style.configure('a.TLabel', font=(StyleDefaults.primaryFont, StyleDefaults.defaultFontSize, 'underline'),
@@ -81,6 +81,9 @@ class Context:
                         background=StyleDefaults.backgroundColour)
         style.configure('pre.TLabel', font=(StyleDefaults.monospaceFont, StyleDefaults.defaultFontSize),
                         foreground=StyleDefaults.primaryColour,
+                        background=StyleDefaults.backgroundColour)
+        style.configure('blockquote.TLabel', font=(StyleDefaults.serifFont, StyleDefaults.importantFontSize),
+                        foreground=StyleDefaults.accentColour2,
                         background=StyleDefaults.backgroundColour)
 
         # Layout top-level window

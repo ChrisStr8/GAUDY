@@ -67,9 +67,10 @@ class Serialiser:
         """
 
         self.write(TEXT_VALUE)
-        data = text.encode('utf-8')
-        # TODO: Replace control sequences in encoded text with escape sequence
-        self.write(data)
+        if text is not None:
+            data = text.encode('utf-8')
+            # TODO: Replace control sequences in encoded text with escape sequence
+            self.write(data)
         return self
 
     def start_list(self):
