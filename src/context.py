@@ -32,14 +32,17 @@ class Context:
         style.configure('Gaudy.TButton', background=StyleDefaults.backgroundColour,
                         foreground=StyleDefaults.secondaryColour, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
         style.map('Gaudy.TButton',
-                  background=[('active', StyleDefaults.defaultColour), ('!disabled', StyleDefaults.accentColour1)],
-                  foreground=[('active', StyleDefaults.backgroundColour), ('!disabled', StyleDefaults.pale_yellow)])
+                  background=[('active', StyleDefaults.button_active), ('!disabled', StyleDefaults.button_inactive)],
+                  foreground=[('active', StyleDefaults.button_text_active),
+                              ('!disabled', StyleDefaults.button_text_inactive)])
 
         style.configure('GaudyGo.TButton', background=StyleDefaults.primaryColour,
                         foreground=StyleDefaults.deep_green, font=(StyleDefaults.userInterfaceFont, 10, 'bold'))
         style.map('GaudyGo.TButton',
-                  background=[('active', StyleDefaults.bright_magenta), ('!disabled', StyleDefaults.deep_green)],
-                  foreground=[('active', StyleDefaults.bright_yellow), ('!disabled', StyleDefaults.pale_yellow)])
+                  background=[('active', StyleDefaults.go_button_active),
+                              ('!disabled', StyleDefaults.go_button_inactive)],
+                  foreground=[('active', StyleDefaults.go_button_text_active),
+                              ('!disabled', StyleDefaults.go_button_text_inactive)])
 
         # element styles
         style.configure('div.TLabel', font=(StyleDefaults.userInterfaceFont, StyleDefaults.defaultFontSize),

@@ -8,6 +8,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
+from src import styleDefaults
+
 
 class Collaborator(Context):
     """
@@ -22,7 +24,7 @@ class Collaborator(Context):
         :param host: The remote server to connect to (ip / dns name)
         :param port: The port to connect on
         """
-
+        # styleDefaults.dark_mode = True
         # Call Context initialiser to create window.
         super().__init__(cid)
 

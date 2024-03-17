@@ -42,7 +42,17 @@ class StyleDefaults:
     backgroundColour = '#ccccff'  # pale_blue  # '#800080'
     link_colour = '#0000EE'
 
-    dark_mode = False
+    button_inactive = '#9500EB'
+    button_active = '#AD0569'
+    button_text_inactive = pale_yellow
+    button_text_active = bright_yellow
+
+    go_button_inactive = deep_green
+    go_button_active = bright_magenta
+    go_button_text_inactive = pale_yellow
+    go_button_text_active = bright_yellow
+
+    dark_mode = True
     if dark_mode:
         defaultColour = '#B4D9C8'
         primaryColour = '#D154FF'
