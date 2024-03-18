@@ -229,10 +229,11 @@ class ImgNode(HtmlNode):
             return proto + '://' + before + '/' + image_path
 
     def add_tk(self, parent, style, indent, dot):
+        frame = ttk.Frame(parent, style=style)
+
         if self.url is not None:
             src = self.get_attr('src')
             path = self.make_path(src)
-            print(path)
             try:
                 response = request.urlopen(path)
                 self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
@@ -247,10 +248,22 @@ class ImgNode(HtmlNode):
 
         if self.image is None:
             self.image = tk.PhotoImage(file="icons/icons8-unavailable-48.png")
+            alt_text = ttk.Label(frame, text=self.get_attr('alt'), style='pre.TLabel')
+            alt_text.grid()
 
-        panel = ttk.Label(parent, image=self.image)
-        panel.grid()
-        return panel
+        picture = ttk.Label(frame, image=self.image)
+        picture.grid(sticky=tk.W)
+
+        if self.get_attr('title') is not None:
+            text = ttk.Label(frame, text=self.get_attr('title'), style='blockquote.TLabel')
+            text.grid(sticky=tk.W)
+
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid()
+
+        self.tk_object = frame
+
+        return frame
 
 
 class UlNode(HtmlNode):
@@ -483,10 +496,7 @@ class HtmlPage:
         self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
 
         # Add the 'scrolly' tag to all child widgets, so that the mouse wheel events are handled properly
-        for node in self.find_nodes(None):
-            widget = node.tk_object
-            if node.tk_object is not None:
-                widget.bindtags(('scrolly',) + widget.bindtags())
+        make_scrolly(self.root.tk_object)
 
     def load_url(self, url):
         """
@@ -589,3 +599,9 @@ def deserialise_page(data, frame):
     page = HtmlPage(frame)
     page.load_data(data)
     return page
+
+
+def make_scrolly(widget):
+    widget.bindtags(('scrolly',) + widget.bindtags())
+    for child in widget.winfo_children():
+        make_scrolly(child)

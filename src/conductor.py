@@ -9,7 +9,7 @@ import re
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from src import styleDefaults
+import styleDefaults
 
 
 class Conductor(Context):

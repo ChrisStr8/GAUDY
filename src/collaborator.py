@@ -8,8 +8,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
-from src import styleDefaults
-
+import styleDefaults
 
 class Collaborator(Context):
     """

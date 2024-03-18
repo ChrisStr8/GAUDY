@@ -23,8 +23,6 @@ class Context:
 
         self.window = tk.Tk()
 
-        print([font for font in tkinter.font.families() if re.match(r'Kalam.*', font)])
-
         # Configure Style
         style = ttk.Style()
         style.theme_use('clam')
@@ -114,9 +112,7 @@ class Context:
         if self.current_page() is None:
             return
         width = self.root.winfo_width() - self.current_page().scrollbar.winfo_width()
-        for data in self.current_page().find_nodes('data'):
-            if data.tk_object is not None:
-                data.tk_object.configure(wraplength=width)
+        set_wraplength(self.current_page().tk_frame, width)
 
     def set_address(self, address):
         """
@@ -125,3 +121,10 @@ class Context:
         """
         self.address_bar.delete(0, tk.END)
         self.address_bar.insert(0, address)
+
+
+def set_wraplength(widget, width):
+    if isinstance(widget, ttk.Label):
+        widget.configure(wraplength=width)
+    for child in widget.winfo_children():
+        set_wraplength(child, width)
