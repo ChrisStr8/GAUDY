@@ -62,6 +62,16 @@ class StyleDefaults:
         backgroundColour = '#471D59'
         link_colour = '#00A1ED'
 
+        button_inactive = dark_blue
+        button_active = deep_cyan
+        button_text_inactive = pale_yellow
+        button_text_active = bright_yellow
+
+        go_button_inactive = dark_green
+        go_button_active = dull_magenta
+        go_button_text_inactive = pale_yellow
+        go_button_text_active = bright_yellow
+
     h1Colour = '#CC00AA'
     h2Colour = '#e60066'
     h3Colour = '#d93823'

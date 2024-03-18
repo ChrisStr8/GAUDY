@@ -12,6 +12,7 @@ import tkinter.ttk as ttk
 import re as re
 
 import serialiser
+from styleDefaults import StyleDefaults
 
 
 class HtmlNode:
@@ -429,7 +430,7 @@ class HtmlPage:
         self.tk_frame = tk_frame
 
         # Create top-level components - Canvas, Scrollbar, and Frame
-        self.scroll_canvas = tk.Canvas(self.tk_frame)
+        self.scroll_canvas = tk.Canvas(self.tk_frame, background=StyleDefaults.backgroundColour, borderwidth=0)
         self.scroll_frame = ttk.Frame(self.scroll_canvas, style='Gaudy.TFrame')
         self.scrollbar = tk.Scrollbar(self.tk_frame, orient="vertical", command=self.scroll_canvas.yview)
 
