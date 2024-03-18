@@ -42,7 +42,17 @@ class StyleDefaults:
     backgroundColour = '#ccccff'  # pale_blue  # '#800080'
     link_colour = '#0000EE'
 
-    dark_mode = False
+    button_inactive = '#9500EB'
+    button_active = '#AD0569'
+    button_text_inactive = pale_yellow
+    button_text_active = bright_yellow
+
+    go_button_inactive = deep_green
+    go_button_active = bright_magenta
+    go_button_text_inactive = pale_yellow
+    go_button_text_active = bright_yellow
+
+    dark_mode = True
     if dark_mode:
         defaultColour = '#B4D9C8'
         primaryColour = '#D154FF'
@@ -51,6 +61,16 @@ class StyleDefaults:
         accentColour2 = '#CF8D00'
         backgroundColour = '#471D59'
         link_colour = '#00A1ED'
+
+        button_inactive = dark_blue
+        button_active = deep_cyan
+        button_text_inactive = pale_yellow
+        button_text_active = bright_yellow
+
+        go_button_inactive = dark_green
+        go_button_active = dull_magenta
+        go_button_text_inactive = pale_yellow
+        go_button_text_active = bright_yellow
 
     h1Colour = '#CC00AA'
     h2Colour = '#e60066'
