@@ -35,7 +35,7 @@ class StyleDefaults:
     dark_cyan = '#227777'
 
     defaultColour = '#AD0569'  # deep_blue  # '#ffffff'
-    primaryColour = '#736403'  # dark_cyan  # '#0085FF'
+    primaryColour = '#348700'  # dark_cyan  # '#0085FF'
     secondaryColour = '#EB006F'  # dark_red  # '#39FF14'
     accentColour1 = '#9500EB'  # bright_magenta  # '#FF00FF'
     accentColour2 = '#E100EB'  # deep_red  # '#FFFF00'
