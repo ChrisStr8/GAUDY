@@ -12,6 +12,7 @@ import tkinter.ttk as ttk
 import re as re
 
 import serialiser
+from src import renderer
 from styleDefaults import StyleDefaults
 
 
@@ -491,6 +492,10 @@ class HtmlPage:
         for data in title_datas:
             title_string += data.get_attr("text")
         self.title = self.address if title_string.isspace() else title_string
+
+        r = renderer.Renderer(self.scroll_frame)
+        r.canvas.grid()
+        r.render(self.root)
 
         # Draw the page by creating Tk controls for each tag.
         self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
