@@ -368,14 +368,14 @@ class GaudyParser(HTMLParser):
                 self.last_child().append('\n')
             else:
                 node = BrNode(self.parent, tag, attrs)
-        elif tag == 'img':
-            node = ImgNode(self.parent, tag, attrs, self.url)
-        elif tag == 'data':
-            node = DataNode(self.parent, tag, attrs)
         elif tag == 'ul':
             node = UlNode(self.parent, tag, attrs)
         elif tag == 'blockquote':
             node = BlockquoteNode(self.parent, tag, attrs)
+        elif tag == 'img':
+            node = ImgNode(self.parent, tag, attrs, self.url)
+        elif tag == 'data':
+            node = DataNode(self.parent, tag, attrs)
         else:
             node = HtmlNode(self.parent, tag, attrs)
 
@@ -493,7 +493,7 @@ class HtmlPage:
             title_string += data.get_attr("text")
         self.title = self.address if title_string.isspace() else title_string
 
-        r = renderer.Renderer(self.scroll_frame)
+        r = renderer.Renderer(self.scroll_frame, 800, 800)
         r.canvas.grid()
         r.render(self.root)
 

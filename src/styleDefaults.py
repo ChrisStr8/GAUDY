@@ -94,3 +94,8 @@ class StyleDefaults:
     h4FontSize = 16
     h5FontSize = 16
     h6FontSize = 16
+
+    top_spacing = 0
+    bottom_spacing = 0
+    start_spacing = 5
+    end_spacing = 0
