@@ -7,7 +7,7 @@ from styleDefaults import StyleDefaults
 
 class Renderer:
     def __init__(self, parent, width, height):
-        self.canvas = tk.Canvas(parent, width=600, height=600, bg=StyleDefaults.backgroundColour)
+        self.canvas = tk.Canvas(parent, width=width, height=height, bg=StyleDefaults.backgroundColour)
         self.x_location = 0
         self.y_location = 0
 
