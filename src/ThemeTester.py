@@ -39,13 +39,30 @@ class Colour:
         h = b[1]
         l = b[2]
 
-        colour ='#' + s[1].replace('l', l).replace('h', h)
-        print(colour)
+        colour = '#' + s[1].replace('l', l).replace('h', h)
 
         return colour
 
 
+foreground = None
+background = None
+label_value = None
+style = None
+
+
+def change_fg():
+    label_value.set(str(foreground))
+    reconfigure()
+
+
+def reconfigure():
+    label_value.set(str(foreground))
+    style.configure('test.TLabel', foreground=foreground.colour_value(), background=background.colour_value(), font=('Liberation Sans', 12))
+
+
 def colour_tester():
+    global label_value, style, foreground, background
+
     window = tk.Tk()
     window.title("Theme Tester")
 
@@ -58,12 +75,10 @@ def colour_tester():
 
     label_value = tk.StringVar()
     style = ttk.Style()
-    reconfigure = lambda: style.configure('test.TLabel', foreground=foreground.colour_value(),
-                                          background=background.colour_value(), font=('Liberation Sans', 12))
 
     ttk.Label(frame, text="Foreground").grid(column=0, row=0)
     fg_frame = ttk.Frame(frame, relief='groove', padding=5)
-    foreground = Colour(fg_frame, lambda: label_value.set(str(foreground)))
+    foreground = Colour(fg_frame, reconfigure)
     fg_frame.grid(column=0, row=1)
 
     ttk.Label(frame, text="Background").grid(column=1, row=0)
