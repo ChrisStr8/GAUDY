@@ -9,7 +9,8 @@ import re
 import tkinter as tk
 import tkinter.ttk as ttk
 
-import styleDefaults
+from messageProtocol import MessageProtocol
+from messageType import *
 
 
 class Conductor(Context):
@@ -59,14 +60,40 @@ class Conductor(Context):
         while self.server_socket in ready[0]:
             # Accept a new collaborator
             connection, address = self.server_socket.accept()
-            self.collaborators.append((connection, address))
+            connection.setblocking(False)
+            collaborator = MessageProtocol(connection, self.cid)
+            self.collaborators.append((collaborator, address, connection))
 
             # Send current page data to the collaborator
-            connection.sendall(self.current_page_data)
-            connection.sendall(b'\f')
+            collaborator.navigate(self.current_page().address)
+            collaborator.pagedata(self.current_page_data)
 
             # Check for another collaborator
             ready = select.select([self.server_socket], [], [], 0)
+
+        ready = select.select([c[2] for c in self.collaborators], [], [], 0)
+        for c in self.collaborators:
+            if c[2] in ready[0]:
+                print('ready')
+                collaborator = c[0]
+                messages = collaborator.receive()
+                for m in messages:
+                    if m.message_type == MESSAGE_DISCONNECTED:
+                        collaborator.active = False
+                    if m.message_type == MESSAGE_INVALID:
+                        collaborator.active = False
+                    elif m.message_type == MESSAGE_TIMEOUT:
+                        collaborator.active = False
+                    elif m.message_type == MESSAGE_NAVIGATION:
+                        self.go(m.data.decode('utf-8'))
+                    elif m.message_type == MESSAGE_PAGEDATA:
+                        collaborator.active = False
+                    else:
+                        collaborator.active = False
+
+        for c in self.collaborators:
+            if not c[0].active:
+                self.collaborators.remove(c)
 
         # Schedule next check after another second.
         self.window.after(1000, lambda: self.check_network())
@@ -164,12 +191,9 @@ class Conductor(Context):
         # Send the page data to each collaborator
         for collaborator in self.collaborators:
             try:
-                collaborator[0].sendall(self.current_page_data)
-                collaborator[0].sendall(b'\f')
+                collaborator[0].pagedata(self.current_page_data)
             except IOError:
-                # Connection lost - remove collaborator from list.
-                collaborator[0].close()
-                self.collaborators.remove(collaborator)
+                collaborator[0].disconnect()
 
     def make_path(self, url):
         addr = self.current_page().address
@@ -210,6 +234,13 @@ class Conductor(Context):
         # Needed for non-user initiated navigation (eg. homepage loaded).
         self.set_address(url)
 
+        # Send a navigation message to each collaborator
+        for collaborator in self.collaborators:
+            try:
+                collaborator[0].navigate(url)
+            except IOError:
+                collaborator[0].disconnect()
+
         try:
             # Destroy previous page (if any)
             if self.current_page() is not None:
@@ -239,6 +270,13 @@ class Conductor(Context):
 
         # Set the address bar to the page's url
         self.set_address(page_data[0])
+
+        # Send a navigation message to each collaborator
+        for collaborator in self.collaborators:
+            try:
+                collaborator[0].navigate(page_data[0])
+            except IOError:
+                collaborator[0].disconnect()
 
         try:
             # Destroy the current page (if any)
@@ -307,5 +345,5 @@ class Conductor(Context):
 
         # Label with the name (host/ip + port) of each collaborator
         for collaborator in self.collaborators:
-            label = ttk.Label(frame, text=collaborator[1])
+            label = ttk.Label(frame, text=collaborator[0].remote_name + ' ' + str(collaborator[1]))
             label.grid()
