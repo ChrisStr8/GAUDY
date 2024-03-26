@@ -6,15 +6,26 @@ from styleDefaults import StyleDefaults
 
 
 class Renderer:
-    def __init__(self, parent, width, height):
-        self.canvas = tk.Canvas(parent, width=width, height=height, bg=StyleDefaults.backgroundColour)
+    def __init__(self, parent):
+        self.canvas = tk.Canvas(parent, bg=StyleDefaults.backgroundColour, )
+
+        self.scrollbar = tk.Scrollbar(parent, orient="vertical", command=self.canvas.yview)
+
+        self.scrollbar.grid(column=1, row=0, sticky=tk.NSEW)
+        self.canvas.grid(column=0, row=0, sticky=tk.NSEW)
+
+        parent.grid_rowconfigure(0, weight=1)
+        parent.grid_columnconfigure(0, weight=1)
+
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.canvas.bind("<Configure>", self.configure_scroll_canvas)
+
         self.x_location = 0
         self.y_location = 0
-        self.x_next = 0
-        self.y_next = 0
+        self.elements_in_page_order = []
         self.line_number = 0
-        self.line = []
-        self.lines = []
+        self.links = []
 
     def render(self, root):
         self.canvas.delete('all')
@@ -39,6 +50,9 @@ class Renderer:
         bold = False
         italic = False
 
+        block_level = False
+        link = False
+
         if node.tag == 'head':
             pass
         elif node.tag == 'title':
@@ -46,22 +60,27 @@ class Renderer:
         elif node.tag == 'body':
             pass
         elif node.tag == 'div':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
             new_styling['font'] = StyleDefaults.userInterfaceFont
             new_styling['foreground'] = StyleDefaults.primaryColour
         elif node.tag == 'span':
             new_styling['italic'] = True
         elif node.tag == 'a':
+            link = True
             new_styling['foreground'] = StyleDefaults.link_colour
             new_styling['underline'] = True
         elif node.tag == 'table':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
         elif node.tag == 'p':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
         elif node.tag == 'pre':
             new_styling['font'] = StyleDefaults.monospaceFont
         elif (node.tag == 'h1' or node.tag == 'h2' or node.tag == 'h3' or node.tag == 'h4' or node.tag == 'h5'
               or node.tag == 'h6'):
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
             new_styling['font'] = StyleDefaults.headingFont
             if node.tag[1] == str(1):
@@ -83,10 +102,23 @@ class Renderer:
                 new_styling['size'] = StyleDefaults.h6FontSize
                 new_styling['foreground'] = StyleDefaults.h6Colour
         elif node.tag == 'hr':
+            block_level = True
+            # print('test hr')
             self.new_line(top_spacing + bottom_spacing)
+            print(" width: " + str(self.canvas.winfo_reqwidth()))
+            line = self.canvas.create_line((0 + (self.canvas.winfo_reqwidth() * 0.1), self.y_location + (size / 2)),
+                                           (self.canvas.winfo_reqwidth() - (self.canvas.winfo_reqwidth() * 0.1),
+                                            self.y_location + (size / 2)), width=1,
+                                           fill=foreground)
+            bg = self.canvas.create_rectangle((0, self.y_location),
+                                              (self.canvas.winfo_reqwidth(), self.y_location + size))
+            elements += (line, bg)
+            self.elements_in_page_order.append((line, bg))
+            self.canvas.tag_raise(line)
         elif node.tag == 'br':
-            pass
+            self.new_line(top_spacing + bottom_spacing)
         elif node.tag == 'ul':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
             if 'indent' not in new_styling:
                 new_styling['indent'] = ''
@@ -97,11 +129,13 @@ class Renderer:
             new_styling['indent'] += '\t'
             new_styling['list_level'] += 1
         elif node.tag == 'ol':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
             new_styling['indent'] = '\t'
             new_styling['list_level'] = 1
             new_styling[f'index{new_styling['list_level']}'] = 0
         elif node.tag == 'li':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
             for style in styling:
                 if style == 'foreground':
@@ -123,6 +157,7 @@ class Renderer:
             self.x_location = bounds[2]
             elements += (text_element,)
         elif node.tag == 'blockquote':
+            block_level = True
             self.new_line(top_spacing + bottom_spacing)
             new_styling['font'] = StyleDefaults.serifFont
             new_styling['background'] = StyleDefaults.pale_green
@@ -175,23 +210,35 @@ class Renderer:
             self.x_location = bounds[2] + end_spacing
             elements += ((text_element, bg_element),)
 
-            self.line.append((text_element, bg_element))
+            # self.canvas.tag_bind()
+
+            self.elements_in_page_order.append((text_element, bg_element))
 
         for child in node.children:
             elements += self.render_node(child, new_styling)
 
-        # print(elements)
+        if block_level:
+            self.new_line(bottom_spacing + top_spacing)
+        if link:
+            self.links.append((node.get_attr('href'), elements))
         return elements
 
     def new_line(self, line_spacing):
-        self.lines.append(self.line)
-        # self.line = []
         self.line_number += 1
         self.x_location = 0
         bottom_of_line = 0
-        for element in self.line:
+        # print(self.elements_in_page_order)
+        for element in self.elements_in_page_order:
             text, bg = element
-            bounds = self.canvas.bbox(text)
+            bounds = self.canvas.bbox(bg)
             if bounds[3] > bottom_of_line:
                 bottom_of_line = bounds[3]
         self.y_location = bottom_of_line + line_spacing
+        # print(self.line)
+
+    def configure_scroll_canvas(self, event):
+        """
+        Scroll frame is being configured, ie. scrolled!
+        :param event: Tk event data
+        """
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))

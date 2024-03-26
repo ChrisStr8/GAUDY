@@ -52,7 +52,7 @@ class StyleDefaults:
     go_button_text_inactive = pale_yellow
     go_button_text_active = bright_yellow
 
-    dark_mode = False
+    dark_mode = True
     if dark_mode:
         defaultColour = '#B4D9C8'
         primaryColour = '#D154FF'

@@ -114,6 +114,7 @@ class HtmlNode:
             child.delete()
         self.children = list()
 
+
 # Following are specialisations of HtmlNode
 
 
@@ -443,24 +444,13 @@ class HtmlPage:
         self.address = ""
         self.tk_frame = tk_frame
 
-        # Create top-level components - Canvas, Scrollbar, and Frame
-        self.scroll_canvas = tk.Canvas(self.tk_frame, background=StyleDefaults.backgroundColour, borderwidth=0)
-        self.scroll_frame = ttk.Frame(self.scroll_canvas, style='Gaudy.TFrame')
-        self.scrollbar = tk.Scrollbar(self.tk_frame, orient="vertical", command=self.scroll_canvas.yview)
+        self.renderer = renderer.Renderer(tk_frame)
 
-        # Layout components
-        self.scrollbar.grid(column=1, row=0, sticky=tk.NSEW)
-        self.scroll_canvas.grid(column=0, row=0, sticky=tk.NSEW)
-        self.scroll_frame.grid(row=0, column=0, sticky=tk.NSEW)
-        self.tk_frame.grid_rowconfigure(0, weight=1)
-        self.tk_frame.grid_columnconfigure(0, weight=1)
-        self.scroll_frame.grid_rowconfigure(0, weight=1)
 
-        # Associate the canvas and scrollbar
-        self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scroll_canvas.create_window((0, 0), window=self.scroll_frame, anchor='nw')
-        self.scroll_frame.bind("<Configure>", self.configure_scroll_frame)
         self.setup_mouse_wheel()
+
+    def render(self):
+        self.renderer.render(self.root)
 
     def setup_mouse_wheel(self):
         # Bet you didn't expect this to be so hard.
@@ -469,11 +459,12 @@ class HtmlPage:
         if sys.platform == 'linux':
             # Mouse wheel is implemented as buttons 4 (up) and 5 (down)!
             top.bind_class('scrolly', '<Button-4>',
-                                lambda e: self.scroll_canvas.yview_scroll(-1, 'units'))
+                           lambda e: self.renderer.canvas.yview_scroll(-1, 'units'))
             top.bind_class('scrolly', '<Button-5>',
-                               lambda e: self.scroll_canvas.yview_scroll(1, 'units'))
+                           lambda e: self.renderer.canvas.yview_scroll(1, 'units'))
         else:
-            top.bind_class('scrolly', '<MouseWheel>', lambda e: self.scroll_canvas.yview_scroll(int(e.delta / -60), 'units'))
+            top.bind_class('scrolly', '<MouseWheel>',
+                           lambda e: self.renderer.canvas.yview_scroll(int(e.delta / -60), 'units'))
 
     def finish_loading(self, parser):
         """
@@ -493,15 +484,11 @@ class HtmlPage:
             title_string += data.get_attr("text")
         self.title = self.address if title_string.isspace() else title_string
 
-        r = renderer.Renderer(self.scroll_frame, 800, 800)
-        r.canvas.grid()
-        r.render(self.root)
-
         # Draw the page by creating Tk controls for each tag.
-        self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
+        # self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
 
         # Add the 'scrolly' tag to all child widgets, so that the mouse wheel events are handled properly
-        make_scrolly(self.root.tk_object)
+        #make_scrolly(self.root.tk_object)
 
     def load_url(self, url):
         """
@@ -537,12 +524,6 @@ class HtmlPage:
         # Finalise loading
         self.finish_loading(parser)
 
-    def configure_scroll_frame(self, event):
-        """
-        Scroll frame is being configured, ie. scrolled!
-        :param event: Tk event data
-        """
-        self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"), width=800, height=600)
 
     def __str__(self):
         return "[" + str(self.title) + "](" + str(self.address) + ")"
@@ -555,7 +536,7 @@ class HtmlPage:
         :return: A list of matching nodes.
         """
         result = list()
-        self.root.find_nodes(result, selector)
+        #self.root.find_nodes(result, selector)
         return result
 
     def find_children(self, *selectors):
@@ -564,7 +545,8 @@ class HtmlPage:
         :param selectors: The selectors to match
         :return: List of nodes matching the chain.
         """
-        result = [self.root]
+        # result = [self.root]
+        result = []
         for selector in selectors:
             scratch = list()
             for node in result:
