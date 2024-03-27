@@ -484,11 +484,7 @@ class HtmlPage:
             title_string += data.get_attr("text")
         self.title = self.address if title_string.isspace() else title_string
 
-        # Draw the page by creating Tk controls for each tag.
-        # self.root.add_tk(self.scroll_frame, style='Gaudy.TFrame', indent='', dot='')
 
-        # Add the 'scrolly' tag to all child widgets, so that the mouse wheel events are handled properly
-        #make_scrolly(self.root.tk_object)
 
     def load_url(self, url):
         """
@@ -588,9 +584,3 @@ def deserialise_page(data, frame):
     page = HtmlPage(frame)
     page.load_data(data)
     return page
-
-
-def make_scrolly(widget):
-    widget.bindtags(('scrolly',) + widget.bindtags())
-    for child in widget.winfo_children():
-        make_scrolly(child)

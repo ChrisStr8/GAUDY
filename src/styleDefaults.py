@@ -99,3 +99,6 @@ class StyleDefaults:
     bottom_spacing = 0
     start_spacing = 5
     end_spacing = 0
+
+    bg_border_width = 0
+    bg_border_colour = 'black'
