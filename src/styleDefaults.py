@@ -101,4 +101,4 @@ class StyleDefaults:
     end_spacing = 0
 
     bg_border_width = 0
-    bg_border_colour = 'black'
+    bg_border_colour = 'red'

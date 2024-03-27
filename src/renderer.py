@@ -276,6 +276,14 @@ class Renderer:
             lx0, ly0, lx1, ly1 = self.canvas.coords(line)
             self.canvas.coords(line, x0 + (width * 0.1), ly0, width - (width * 0.1), ly1)
 
-    def bind_links(self, context):
+    def bind_links(self, conductor):
         for a in self.post_render["a"]:
             href, elements = a
+            path = conductor.make_path(href)
+            for element in elements:
+                item, bg = element
+                # print(item)
+                # print(path)
+                bind = lambda c, tag, link: self.canvas.tag_bind(tag, "<Button-1>", lambda event: c.go(link))
+                bind(conductor, item, path)
+                bind(conductor, bg, path)

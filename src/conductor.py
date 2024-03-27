@@ -146,6 +146,7 @@ class Conductor(Context):
         self.current_page().render()
 
         # Make links clickable
+        self.current_page().renderer.bind_links(self)
         # Find all '<a>' tags
         for anchor in self.current_page().find_nodes('a'):
             children = list()

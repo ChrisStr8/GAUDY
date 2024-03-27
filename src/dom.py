@@ -446,7 +446,6 @@ class HtmlPage:
 
         self.renderer = renderer.Renderer(tk_frame)
 
-
         self.setup_mouse_wheel()
 
     def render(self):
