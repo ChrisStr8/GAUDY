@@ -8,7 +8,14 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 
-import styleDefaults
+from messageProtocol import MessageProtocol
+from messageType import *
+
+
+def disconnect():
+    messagebox.showinfo('Session Closed', 'Conductor has disconnected.')
+    exit()
+
 
 class Collaborator(Context):
     """
@@ -32,9 +39,9 @@ class Collaborator(Context):
         ui = self.make_ui_frame()
 
         # Connect to Conductor
-        self.conductor = socket.create_connection((host, port))
-        self.conductor.setblocking(False)
-        self.buffer = bytearray()
+        self.connection = socket.create_connection((host, port))
+        self.connection.setblocking(False)
+        self.conductor = MessageProtocol(self.connection, self.cid)
         self.current_page_data = None
         self.page = None
 
@@ -51,32 +58,23 @@ class Collaborator(Context):
         """
 
         # Check for incoming data from the conductor.
-        ready = select.select([self.conductor], [], [], 0)
+        ready = select.select([self.connection], [], [], 0)
 
-        if self.conductor in ready[0]:
-            # Data is available
-            while True:
-                try:
-                    # Receive data from Conductor
-                    response = self.conductor.recv(4096, 0)
-                except BlockingIOError:
-                    # End of incoming data
-                    break
-                if len(response) == 0:
-                    # Connection has been lost
-                    messagebox.showinfo('Session Closed', 'Conductor has ended the session',)
-                    exit()
-                # Add data to buffer
-                self.buffer.extend(response)
-
-        # Look for messages in buffer
-        # Messages are serialised HTML data terminated by a form-feed
-        while b'\f' in self.buffer:
-            idx = self.buffer.find(b'\f')
-            page_data = self.buffer[0:idx]
-            self.buffer = bytearray(self.buffer[idx+1:])
-            # Message received, load the page
-            self.visit_page(page_data)
+        if self.connection in ready[0]:
+            messages = self.conductor.receive()
+            for m in messages:
+                if m.message_type == MESSAGE_DISCONNECTED:
+                    disconnect()
+                if m.message_type == MESSAGE_INVALID:
+                    disconnect()
+                elif m.message_type == MESSAGE_TIMEOUT:
+                    disconnect()
+                elif m.message_type == MESSAGE_NAVIGATION:
+                    self.set_address(m.data.decode('utf-8'))
+                elif m.message_type == MESSAGE_PAGEDATA:
+                    self.visit_page(m.data)
+                else:
+                    disconnect()
 
         # Schedule next network check one second later
         self.window.after(1000, lambda: self.check_network())
