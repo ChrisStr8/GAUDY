@@ -6,14 +6,10 @@ from html.parser import HTMLParser
 import base64
 
 from http.client import HTTPException
-
-import tkinter as tk
-import tkinter.ttk as ttk
 import re as re
 
 import serialiser
 from src import renderer
-from styleDefaults import StyleDefaults
 
 
 class HtmlNode:
@@ -82,29 +78,6 @@ class HtmlNode:
             if a[0] == attr:
                 self.attrs.remove(a)
 
-    def add_tk(self, parent, style, indent, dot):
-        """
-        Add a Tk frame to represent this tag.
-        :param parent: The Parent Tk frame.
-        :param style: The style string to use.
-        :param indent: an int denoting the level of indentation
-        :param dot: the character to use for list elements
-        :return: The frame added.
-        """
-
-        frame = ttk.Frame(parent, style=style)
-
-        # Recursively call add_tk to create tk controls for children.
-        for child in self.children:
-            s = style
-            if child.tag == 'data' and not re.match(r'.*TLabel', s):
-                s = 'p.TLabel'
-            child.add_tk(frame, s, indent, dot)
-
-        frame.grid(sticky=tk.W)
-        self.tk_object = frame
-        return frame
-
     def delete(self):
         """
         Remove all children recursively, allowing nodes to be freed by the garbage collector.
@@ -116,98 +89,6 @@ class HtmlNode:
 
 
 # Following are specialisations of HtmlNode
-
-
-class HeadNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Don't render any children of <head>
-        pass
-
-
-class TitleNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Don't render any children of <title>
-        return None
-
-
-class BodyNode(HtmlNode):
-    pass
-
-
-class DivNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'div.TLabel', indent, dot)
-
-
-class SpanNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'span.TLabel', indent, dot)
-
-
-class ANode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with alternate style.
-        super().add_tk(parent, 'a.TLabel', indent, dot)
-
-        # Set cursor to pointing hand when hovering over a link.
-        self.tk_object.configure(cursor='hand2')
-        return self.tk_object
-
-
-class TableNode(HtmlNode):
-    pass
-
-
-class PNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'p.TLabel', indent, dot)
-
-
-class PreNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'pre.TLabel', indent, dot)
-
-
-class HNode(HtmlNode):
-    """
-    All heading levels (h1 - h6) use this class.
-    """
-
-    def __init__(self, parent, tag, attrs, h_level):
-        """
-        Create a heading node with given level (1 - 6)
-        :param parent: Containing node - None for top-level <html> tag
-        :param tag: Name of tag. Special value 'data' used for text nodes.
-        :param attrs: List of key-value pairs of attributes.
-        :param h_level: Level of node (1 - 6)
-        """
-        super().__init__(parent, tag, attrs)
-        self.h_level = h_level
-
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with correct heading style
-        return super().add_tk(parent, f'h{self.h_level}.TLabel', indent, dot)
-
-
-class HrNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Draw a Horizontal Line
-        line_break = ttk.Label(parent, text='--------------------------------', style='hr.TLabel')
-        line_break.grid(stick=tk.W)
-        return line_break
-
-
-class BrNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Force a line break
-        line_break = ttk.Label(parent, text='', style='br.TLabel')
-        line_break.grid(stick=tk.W)
-        return line_break
-
 
 class ImgNode(HtmlNode):
 
@@ -245,60 +126,6 @@ class ImgNode(HtmlNode):
             # Relative path
             before, sep, after = path.rpartition('/')
             return proto + '://' + before + '/' + image_path
-
-    def add_tk(self, parent, style, indent, dot):
-        frame = ttk.Frame(parent, style=style)
-
-        if self.get_attr('data') is not None:
-            try:
-                self.image = tk.PhotoImage(data=base64.b64decode(self.get_attr('data')))
-            except tk.TclError:
-                pass
-
-        if self.image is None:
-            self.image = tk.PhotoImage(file="icons/icons8-unavailable-48.png")
-            alt_text = ttk.Label(frame, text=self.get_attr('alt'), style='pre.TLabel')
-            alt_text.grid()
-
-        picture = ttk.Label(frame, image=self.image)
-        picture.grid(sticky=tk.W)
-
-        if self.get_attr('title') is not None:
-            text = ttk.Label(frame, text=self.get_attr('title'), style='blockquote.TLabel')
-            text.grid(sticky=tk.W)
-
-        frame.grid_columnconfigure(0, weight=1)
-        frame.grid()
-
-        self.tk_object = frame
-
-        return frame
-
-
-class UlNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        return super().add_tk(parent, style, indent + '\t', '•')
-
-
-class BlockquoteNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Call HtmlNode.add_tk with alternate style
-        return super().add_tk(parent, 'blockquote.TLabel', indent, dot)
-
-
-class DataNode(HtmlNode):
-    def add_tk(self, parent, style, indent, dot):
-        # Create a label with the node's text
-        self.attrs.append(('style', style))
-        label = ttk.Label(parent, text=(indent + dot + self.get_attr("text")), style=style)
-        self.tk_object = label
-        label.grid(stick=tk.W)
-        return label
-
-    def append(self, text):
-        new_text = self.get_attr('text') + text
-        self.clear_attr('text')
-        self.attrs.append(('text', new_text))
 
 
 def is_void(tag):
@@ -348,42 +175,8 @@ class GaudyParser(HTMLParser):
 
         # Choose which specialisation of HtmlNode to create
         # Unrecognised tags use the base HtmlNode.
-        if tag == 'head':
-            node = HeadNode(self.parent, tag, attrs)
-        elif tag == 'title':
-            node = TitleNode(self.parent, tag, attrs)
-        elif tag == 'body':
-            node = BodyNode(self.parent, tag, attrs)
-        elif tag == 'div':
-            node = DivNode(self.parent, tag, attrs)
-        elif tag == 'span':
-            node = SpanNode(self.parent, tag, attrs)
-        elif tag == 'a':
-            node = ANode(self.parent, tag, attrs)
-        elif tag == 'table':
-            node = TableNode(self.parent, tag, attrs)
-        elif tag == 'p':
-            node = PNode(self.parent, tag, attrs)
-        elif tag == 'pre':
-            node = PreNode(self.parent, tag, attrs)
-        elif tag == 'h1' or tag == 'h2' or tag == 'h3' or tag == 'h4' or tag == 'h5' or tag == 'h6':
-            node = HNode(self.parent, tag, attrs, tag[1])
-        elif tag == 'hr':
-            node = HrNode(self.parent, tag, attrs)
-        elif tag == 'br':
-            # Don't insert a new node for br between data
-            if self.match_last_child('data'):
-                self.last_child().append('\n')
-            else:
-                node = BrNode(self.parent, tag, attrs)
-        elif tag == 'ul':
-            node = UlNode(self.parent, tag, attrs)
-        elif tag == 'blockquote':
-            node = BlockquoteNode(self.parent, tag, attrs)
-        elif tag == 'img':
+        if tag == 'img':
             node = ImgNode(self.parent, tag, attrs, self.url)
-        elif tag == 'data':
-            node = DataNode(self.parent, tag, attrs)
         else:
             node = HtmlNode(self.parent, tag, attrs)
 

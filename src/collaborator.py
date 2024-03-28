@@ -130,6 +130,8 @@ class Collaborator(Context):
             # Set window title, address, and layout labels.
             self.window.title(self.current_page().title)
             self.set_address(self.current_page().address)
+
+            self.page.render()
         except ValueError as e:
             print(e)
 

@@ -193,7 +193,6 @@ class Conductor(Context):
                                                             lambda event: self.go(
                                                                 self.make_path(a.get_attr('href')))))()
 
-
         # Send the page data to each collaborator
         for collaborator in self.collaborators:
             try:
@@ -237,7 +236,7 @@ class Conductor(Context):
         self.back_history = list()
 
         # Set the url in the address bar
-        # Needed for non-user initiated navigation (eg. homepage loaded).
+        # Needed for non-user initiated navigation (e.g. homepage loaded).
         self.set_address(url)
 
         # Send a navigation message to each collaborator

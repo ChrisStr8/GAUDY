@@ -63,7 +63,7 @@ class Renderer:
         }
 
     def render(self, root):
-        print('render ' + root.tag)
+        # print('render ' + root.tag)
         # reset canvas
         self.canvas.delete('all')
         # reset position for rendering
@@ -324,14 +324,15 @@ class Renderer:
             bind = lambda c, tag, link: self.canvas.tag_bind(tag, "<Button-1>", lambda event: c.go(link))
             href, elements = a
             path = conductor.make_path(href)
-            print('elements' + str(elements))
+            # print('elements' + str(elements))
             for element in elements:
-                print('element' + str(element))
+                # print('element' + str(element))
                 item = None
                 bg = None
                 if type(element) is not tuple:
-                    print(element)
-                    print('not tuple')
+                    pass
+                    # print(element)
+                    # print('not tuple')
                 elif len(element) == 2:
                     item, bg = element
                     bind(conductor, item, path)
