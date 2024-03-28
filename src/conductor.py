@@ -71,7 +71,11 @@ class Conductor(Context):
             # Check for another collaborator
             ready = select.select([self.server_socket], [], [], 0)
 
-        ready = select.select([c[2] for c in self.collaborators], [], [], 0)
+        sockets = [c[2] for c in self.collaborators]
+        if len(sockets) == 0:
+            ready = ([], [], [])
+        else:
+            ready = select.select([c[2] for c in self.collaborators], [], [], 0)
         for c in self.collaborators:
             if c[2] in ready[0]:
                 print('ready')
@@ -183,7 +187,8 @@ class Conductor(Context):
                 # This is because the child reference is changed, with the nested lambda using the same binding.
                 # If you know a better way to do this, please tell Stuart :)
                 (lambda c=child, a=anchor: c.tk_object.bind("<Button-1>",
-                                                  lambda event: self.go(self.make_path(a.get_attr('href')))))()
+                                                            lambda event: self.go(
+                                                                self.make_path(a.get_attr('href')))))()
 
         # Fit labels into the frame
         self.set_label_length()
