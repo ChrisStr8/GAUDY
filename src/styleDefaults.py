@@ -52,7 +52,7 @@ class StyleDefaults:
     go_button_text_inactive = pale_yellow
     go_button_text_active = bright_yellow
 
-    dark_mode = False
+    dark_mode = True
     if dark_mode:
         defaultColour = '#B4D9C8'
         primaryColour = '#D154FF'
@@ -94,3 +94,11 @@ class StyleDefaults:
     h4FontSize = 16
     h5FontSize = 16
     h6FontSize = 16
+
+    top_spacing = 0
+    bottom_spacing = 0
+    start_spacing = 5
+    end_spacing = 0
+
+    bg_border_width = 0
+    bg_border_colour = 'red'

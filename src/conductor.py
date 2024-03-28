@@ -143,7 +143,10 @@ class Conductor(Context):
         # Set the window title.
         self.window.title(self.current_page().title)
 
+        self.current_page().render()
+
         # Make links clickable
+        self.current_page().renderer.bind_links(self)
         # Find all '<a>' tags
         for anchor in self.current_page().find_nodes('a'):
             children = list()
@@ -158,8 +161,6 @@ class Conductor(Context):
                 (lambda c=child, a=anchor: c.tk_object.bind("<Button-1>",
                                                   lambda event: self.go(self.make_path(a.get_attr('href')))))()
 
-        # Fit labels into the frame
-        self.set_label_length()
 
         # Send the page data to each collaborator
         for collaborator in self.collaborators:
