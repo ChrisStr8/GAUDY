@@ -216,11 +216,27 @@ class ImgNode(HtmlNode):
         self.image = None
         self.url = url
 
+        if self.url is not None:
+            src = self.get_attr('src')
+            path = self.make_path(src)
+            try:
+                print(path)
+                response = request.urlopen(path)
+                self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
+            except (HTTPError or URLError) as e:
+                print('test')
+                print(path, e)
+
     def make_path(self, image_path):
         proto, _, path = self.url.partition('://')
+        # print("proto is " + proto)
+        # print("_ is " + _)
+        # print("path is " + image_path)
         if re.match(r'\w*:.*', image_path):
             # Full url
             return image_path
+        elif image_path[0] + image_path[1] == '//':
+            return 'https:' + image_path
         elif image_path[0] == '/':
             # Absolute path
             before, sep, after = path.partition('/')
@@ -232,15 +248,6 @@ class ImgNode(HtmlNode):
 
     def add_tk(self, parent, style, indent, dot):
         frame = ttk.Frame(parent, style=style)
-
-        if self.url is not None:
-            src = self.get_attr('src')
-            path = self.make_path(src)
-            try:
-                response = request.urlopen(path)
-                self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
-            except (HTTPError or URLError) as e:
-                print(path, e)
 
         if self.get_attr('data') is not None:
             try:
