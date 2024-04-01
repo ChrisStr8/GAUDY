@@ -52,12 +52,18 @@ class Context:
         self.window.grid_columnconfigure(0, weight=1)
         self.window.grid_rowconfigure(0, weight=1)
 
+        self.page = None
+
 
     def make_ui_frame(self):
         pass
 
     def current_page(self):
-        return None
+        """
+        Get the currently displayed page.
+        :return: The current page.
+        """
+        return self.page
 
     def set_address(self, address):
         """

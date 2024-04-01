@@ -1,7 +1,6 @@
 import base64
 import copy
 import tkinter as tk
-import tkinter.ttk as ttk
 
 from styleDefaults import StyleDefaults
 

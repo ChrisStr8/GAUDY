@@ -4,8 +4,6 @@ from urllib.error import URLError, HTTPError
 from html.parser import HTMLParser
 
 import base64
-
-from http.client import HTTPException
 import re as re
 
 import serialiser
@@ -21,7 +19,6 @@ class HtmlNode:
     children = None
     tag = None
     attrs = None
-    tk_object = None
 
     def __init__(self, parent, tag, attrs):
         """
@@ -101,11 +98,9 @@ class ImgNode(HtmlNode):
             src = self.get_attr('src')
             path = self.make_path(src)
             try:
-                print(path)
                 response = request.urlopen(path)
                 self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
             except (HTTPError or URLError) as e:
-                print('test')
                 print(path, e)
 
     def make_path(self, image_path):

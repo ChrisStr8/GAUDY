@@ -1,6 +1,5 @@
 from html.parser import HTMLParser
 
-
 # Constants for serialisation
 OBJECT = b'\x00'
 END_OBJECT = b'\x01'
@@ -13,7 +12,7 @@ END_LIST_VALUE = b'\x05'
 class Serialiser:
     """
     Converts a HtmlPage in to a series of bytes.
-    Methods tend to return self so that we can write eg. self.write(b'some data').write(b'more data').
+    Methods tend to return self so that we can write e.g. self.write(b'some data').write(b'more data').
     """
 
     def __init__(self):
@@ -96,11 +95,7 @@ class Serialiser:
         :return:
         """
 
-        # If there is a tk object for this node, then add its type as an attribute
-        tk = node.tk_object
         self.object(node.tag.encode('utf-8'))
-        if tk is not None:
-            self.field(b'tk_object').text(tk.widgetName)
 
         # Write the attribute list (list of text fields)
         if len(node.attrs) > 0:

@@ -7,6 +7,7 @@ import select
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
+import re
 
 from messageProtocol import MessageProtocol
 from messageType import *
@@ -43,7 +44,6 @@ class Collaborator(Context):
         self.connection.setblocking(False)
         self.conductor = MessageProtocol(self.connection, self.cid)
         self.current_page_data = None
-        self.page = None
 
         # Setup network check.
         self.window.after(10, lambda: self.check_network())
@@ -115,9 +115,6 @@ class Collaborator(Context):
         :param page_data: Serialised page data
         """
         try:
-            # Destroy current page
-            if self.current_page() is not None:
-                self.current_page().delete()
 
             # Setup page frame
             page_frame = ttk.Frame(self.root)
@@ -132,9 +129,38 @@ class Collaborator(Context):
             self.set_address(self.current_page().address)
 
             self.page.render()
+            self.page.renderer.bind_links(self)
         except ValueError as e:
             print(e)
 
+    def make_path(self, url):
+        addr = self.current_page().address
+        proto, _, path = addr.partition('://')
+
+        # Ignore any fragment
+        if url[0] == '#':
+            # Fragment relative to current page - reload the page
+            return addr
+
+        # Strip fragment
+        frag_pos = url.find('#')
+        if frag_pos != -1:
+            url = url[0:frag_pos]
+
+        if re.match(r'\w*:.*', url):
+            # Full url
+            return url
+        elif url[0] == '/':
+            # Absolute path
+            before, sep, after = path.partition('/')
+            return proto + '://' + before + url
+        else:
+            # Relative path
+            before, sep, after = path.rpartition('/')
+            return proto + '://' + before + '/' + url
+
+    def go(self, url):
+        self.conductor.navigate(url)
 
 if __name__ == '__main__':
     Collaborator('Collaborator', 'localhost', 10000)
