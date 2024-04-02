@@ -92,6 +92,10 @@ class Conductor(Context):
                         self.go(m.data.decode('utf-8'))
                     elif m.message_type == MESSAGE_PAGEDATA:
                         collaborator.active = False
+                    elif m.message_type == MESSAGE_BACK:
+                        self.back()
+                    elif m.message_type == MESSAGE_FORWARD:
+                        self.forward()
                     else:
                         collaborator.active = False
 
@@ -199,32 +203,6 @@ class Conductor(Context):
                 collaborator[0].pagedata(self.current_page_data)
             except IOError:
                 collaborator[0].disconnect()
-
-    def make_path(self, url):
-        addr = self.current_page().address
-        proto, _, path = addr.partition('://')
-
-        # Ignore any fragment
-        if url[0] == '#':
-            # Fragment relative to current page - reload the page
-            return addr
-
-        # Strip fragment
-        frag_pos = url.find('#')
-        if frag_pos != -1:
-            url = url[0:frag_pos]
-
-        if re.match(r'\w*:.*', url):
-            # Full url
-            return url
-        elif url[0] == '/':
-            # Absolute path
-            before, sep, after = path.partition('/')
-            return proto + '://' + before + url
-        else:
-            # Relative path
-            before, sep, after = path.rpartition('/')
-            return proto + '://' + before + '/' + url
 
     def go_to_page(self, url):
         """

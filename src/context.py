@@ -73,6 +73,31 @@ class Context:
         self.address_bar.delete(0, tk.END)
         self.address_bar.insert(0, address)
 
+    def make_path(self, url):
+        addr = self.current_page().address
+        proto, _, path = addr.partition('://')
+
+        # Ignore any fragment
+        if url[0] == '#':
+            # Fragment relative to current page - reload the page
+            return addr
+
+        # Strip fragment
+        frag_pos = url.find('#')
+        if frag_pos != -1:
+            url = url[0:frag_pos]
+
+        if re.match(r'\w*:.*', url):
+            # Full url
+            return url
+        elif url[0] == '/':
+            # Absolute path
+            before, sep, after = path.partition('/')
+            return proto + '://' + before + url
+        else:
+            # Relative path
+            before, sep, after = path.rpartition('/')
+            return proto + '://' + before + '/' + url
 
 def set_wraplength(widget, width):
     if isinstance(widget, ttk.Label):

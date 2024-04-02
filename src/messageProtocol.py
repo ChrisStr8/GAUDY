@@ -110,5 +110,11 @@ class MessageProtocol:
     def navigate(self, url: str) -> None:
         self.send_message(Message(MESSAGE_NAVIGATION, url.encode('utf-8')))
 
+    def back(self) -> None:
+        self.send_message(Message(MESSAGE_BACK, 'back'.encode('utf-8')))
+
+    def forward(self) -> None:
+        self.send_message(Message(MESSAGE_FORWARD, 'forward'.encode('utf-8')))
+
     def pagedata(self, data: bytes) -> None:
         self.send_message(Message(MESSAGE_PAGEDATA, data))

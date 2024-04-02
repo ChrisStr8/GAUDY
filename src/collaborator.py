@@ -94,9 +94,22 @@ class Collaborator(Context):
         address.set("")
         address_bar = ttk.Entry(ui_frame, textvariable=address)
 
+        # Create Navigation Buttons (back and forward)
+        nav_section = ttk.Frame(ui_frame)
+        ttk.Button(nav_section, text='Back', style='Gaudy.TButton', command=self.back).grid(column=0, row=1,
+                                                                                            sticky=tk.W)
+        ttk.Button(nav_section, text='Forward', style='Gaudy.TButton', command=self.forward).grid(column=1, row=1,
+                                                                                                  sticky=tk.E)
+
+        # create go button
+        go_to_button = ttk.Button(ui_frame, text='Go!', command=lambda: self.go(address.get()),
+                                  style='GaudyGo.TButton')
+
         # Layout Address Field
-        ui_frame.grid_columnconfigure(0, weight=1)
-        address_bar.grid(row=0, column=0, sticky=tk.NSEW)
+        ui_frame.grid_columnconfigure(1, weight=1)
+        nav_section.grid(row=0, column=0, sticky=tk.W)
+        address_bar.grid(row=0, column=1, sticky=tk.NSEW)
+        go_to_button.grid(row=0, column=2, sticky=tk.E)
         self.address_bar = address_bar
 
         return ui_frame
@@ -133,34 +146,16 @@ class Collaborator(Context):
         except ValueError as e:
             print(e)
 
-    def make_path(self, url):
-        addr = self.current_page().address
-        proto, _, path = addr.partition('://')
-
-        # Ignore any fragment
-        if url[0] == '#':
-            # Fragment relative to current page - reload the page
-            return addr
-
-        # Strip fragment
-        frag_pos = url.find('#')
-        if frag_pos != -1:
-            url = url[0:frag_pos]
-
-        if re.match(r'\w*:.*', url):
-            # Full url
-            return url
-        elif url[0] == '/':
-            # Absolute path
-            before, sep, after = path.partition('/')
-            return proto + '://' + before + url
-        else:
-            # Relative path
-            before, sep, after = path.rpartition('/')
-            return proto + '://' + before + '/' + url
-
     def go(self, url):
+        print(url)
         self.conductor.navigate(url)
+
+    def back(self):
+        self.conductor.back()
+
+    def forward(self):
+        self.conductor.forward()
+
 
 if __name__ == '__main__':
     Collaborator('Collaborator', 'localhost', 10000)
