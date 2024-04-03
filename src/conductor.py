@@ -167,6 +167,7 @@ class Conductor(Context):
         :param url: The URL of the page to load
         """
         self.page_history.append((self.current_page().address, self.current_page_data))
+        print(url)
         self.go_to_page(url)
 
     def finish_going(self):

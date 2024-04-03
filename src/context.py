@@ -54,7 +54,6 @@ class Context:
 
         self.page = None
 
-
     def make_ui_frame(self):
         pass
 
@@ -90,6 +89,8 @@ class Context:
         if re.match(r'\w*:.*', url):
             # Full url
             return url
+        elif re.match(r'^//', url):
+            return 'https:' + url
         elif url[0] == '/':
             # Absolute path
             before, sep, after = path.partition('/')
@@ -98,6 +99,7 @@ class Context:
             # Relative path
             before, sep, after = path.rpartition('/')
             return proto + '://' + before + '/' + url
+
 
 def set_wraplength(widget, width):
     if isinstance(widget, ttk.Label):

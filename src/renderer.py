@@ -1,6 +1,9 @@
 import base64
 import copy
 import tkinter as tk
+from io import BytesIO
+
+from PIL import ImageTk, Image
 
 from styleDefaults import StyleDefaults
 
@@ -253,22 +256,29 @@ class Renderer:
 
         if node.get_attr('data') is not None:
             try:
-                node.image = tk.PhotoImage(data=base64.b64decode(node.get_attr('data')))
+                node.image = ImageTk.PhotoImage(data=base64.b64decode(node.get_attr('data')))
             except tk.TclError:
                 pass
 
         img = None
 
         if node.image is None:
+            # print('image error')
             node.image = tk.PhotoImage(file="icons/icons8-unavailable-48.png")
-            img = self.canvas.create_text((self.x_location + styling['start_spacing'],
+            img = self.canvas.create_image((self.x_location + styling['start_spacing'],
+                                            self.y_location + styling['top_spacing']),
+                                           anchor=tk.NW,
+                                           image=node.image)
+            title = alt
+            '''img = self.canvas.create_text((self.x_location + styling['start_spacing'],
                                            self.y_location + styling['top_spacing']),
                                           anchor=tk.NW,
                                           text=alt,
                                           font=font,
                                           fill=styling['foreground']
-                                          )
+                                          )'''
         else:
+            # print('loaded image')
             img = self.canvas.create_image((self.x_location + styling['start_spacing'],
                                             self.y_location + styling['top_spacing']),
                                            anchor=tk.NW,
@@ -289,7 +299,7 @@ class Renderer:
                                           outline=styling['border_colour'])
         self.canvas.tag_raise(img, bg)
         self.canvas.tag_raise(t, bg)
-
+        # print(f"img: {img}, t: {t}, bg: {bg}")
         return img, t, bg
 
     def new_line(self, line_spacing):
@@ -318,28 +328,35 @@ class Renderer:
             lx0, ly0, lx1, ly1 = self.canvas.coords(line)
             self.canvas.coords(line, x0 + (width * 0.1), ly0, width - (width * 0.1), ly1)
 
-    def bind_links(self, conductor):
+    def bind_links(self, context):
         for a in self.post_render["a"]:
-            bind = lambda c, tag, link: self.canvas.tag_bind(tag, "<Button-1>", lambda event: c.go(link))
             href, elements = a
-            path = conductor.make_path(href)
+            path = context.make_path(href)
+            print(f"href: {href}, path: {path}")
             # print('elements' + str(elements))
             for element in elements:
                 # print('element' + str(element))
-                item = None
-                bg = None
                 if type(element) is not tuple:
-                    pass
-                    # print(element)
-                    # print('not tuple')
+                    self.link_bind(context, element, path)
                 elif len(element) == 2:
                     item, bg = element
-                    bind(conductor, item, path)
-                    bind(conductor, bg, path)
+                    self.link_bind(context, item, path)
+                    self.link_bind(context, bg, path)
                 elif len(element) == 3:  # image in link
                     item, title, bg = element
-                    bind(conductor, title, path)
-                    bind(conductor, item, path)
-                    bind(conductor, bg, path)
+                    self.link_bind(context, title, path)
+                    self.link_bind(context, item, path)
+                    self.link_bind(context, bg, path)
                 # print(item)
                 # print(path)
+
+    def check_hand_enter(self):
+        self.canvas.config(cursor="hand2")
+
+    def check_hand_leave(self):
+        self.canvas.config(cursor="")
+
+    def link_bind(self, context, tag, link):
+        self.canvas.tag_bind(tag, "<Button-1>", lambda event: context.go(link))
+        self.canvas.tag_bind(tag, "<Enter>", lambda event: self.check_hand_enter())
+        self.canvas.tag_bind(tag, "<Leave>", lambda event: self.check_hand_leave())
