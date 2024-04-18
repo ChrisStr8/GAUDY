@@ -1,14 +1,20 @@
 import base64
 import copy
+import io
 import tkinter as tk
 from io import BytesIO
 
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, UnidentifiedImageError
 
 from styleDefaults import StyleDefaults
 
 
 def load_font_style(styling):
+    """
+    builds a font tuple from style dictionary.
+    :param styling: style dictionary
+    :return: styled font in tuple form
+    """
     font = (styling['font'], styling['size'])
 
     # add style elements to the font
@@ -65,6 +71,11 @@ class Renderer:
         }
 
     def render(self, root):
+        """
+        begins rendering of the DOM from the root node.
+        clears the canvas and redraws everything
+        :param root: node to start rendering from
+        """
         # print('render ' + root.tag)
         # reset canvas
         self.canvas.delete('all')
@@ -81,6 +92,12 @@ class Renderer:
         self.render_node(root, self.default_style)
 
     def render_node(self, node, styling):
+        """
+        recursively renders each node in the DOM tree.
+        :param node: node to be rendered
+        :param styling: style dictionary
+        :return: nested tuples of elements from this node and its children
+        """
         new_styling = copy.deepcopy(styling)
         elements = tuple()
         # load font
@@ -218,12 +235,14 @@ class Renderer:
         elif node.tag == 'data':
             text = node.get_attr("text")
 
+            width = self.canvas.winfo_width()
+            # print(width)
             text_element = self.canvas.create_text(
                 (self.x_location + styling['start_spacing'], self.y_location + styling['top_spacing']),
                 anchor=tk.NW,
                 fill=styling['foreground'],
                 text=text,
-                font=font,
+                font=font
             )
             bounds = self.canvas.bbox(text_element)
             bg_element = self.canvas.create_rectangle((bounds[0], bounds[1]), (bounds[2], bounds[3]),
@@ -249,15 +268,25 @@ class Renderer:
         return elements
 
     def render_image(self, node, styling):
+        """
+        renders an image node.
+        :param node: node to be rendered
+        :param styling: dictionary of style info
+        :return: tuple of image, text, and background elements
+        """
         font = load_font_style(styling)
         node.image = None
-        title = node.get_attr('title')
+        text = node.get_attr('title')
         alt = node.get_attr('alt')
 
         if node.get_attr('data') is not None:
             try:
-                node.image = ImageTk.PhotoImage(data=base64.b64decode(node.get_attr('data')))
+                data = base64.b64decode(node.get_attr('data'))
+                # print(data)
+                node.image = ImageTk.PhotoImage(data=data)
             except tk.TclError:
+                pass
+            except UnidentifiedImageError:
                 pass
 
         img = None
@@ -269,30 +298,22 @@ class Renderer:
                                             self.y_location + styling['top_spacing']),
                                            anchor=tk.NW,
                                            image=node.image)
-            title = alt
-            '''img = self.canvas.create_text((self.x_location + styling['start_spacing'],
-                                           self.y_location + styling['top_spacing']),
-                                          anchor=tk.NW,
-                                          text=alt,
-                                          font=font,
-                                          fill=styling['foreground']
-                                          )'''
+            text = alt
         else:
             # print('loaded image')
             img = self.canvas.create_image((self.x_location + styling['start_spacing'],
                                             self.y_location + styling['top_spacing']),
                                            anchor=tk.NW,
                                            image=node.image)
-        if title is None:
-            title = 'no title'
+        if text is None:
+            text = node.get_attr('src')
 
         img_bounds = self.canvas.bbox(img)
         t = self.canvas.create_text((img_bounds[0], img_bounds[3]),
                                     anchor=tk.NW,
-                                    text=title,
+                                    text=text,
                                     font=font,
                                     fill=styling['foreground'])
-        t_bounds = self.canvas.bbox(t)
         bounds = self.canvas.bbox(img, t)
         bg = self.canvas.create_rectangle(bounds,
                                           width=styling['border_width'], fill=styling['background'],
@@ -303,6 +324,10 @@ class Renderer:
         return img, t, bg
 
     def new_line(self, line_spacing):
+        """
+        resets the x location and moves the y location to below the lowest point reached so far
+        :param line_spacing: distance below the lowest point
+        """
         self.line_number += 1
         self.x_location = 0
         bounds = self.canvas.bbox('all')
@@ -316,9 +341,14 @@ class Renderer:
         """
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-        self.adjust_to_dimensions(self.canvas.winfo_width(), self.canvas.winfo_height())
+        self.adjust_to_dimensions(self.canvas.winfo_width())
 
-    def adjust_to_dimensions(self, width, height):
+    def adjust_to_dimensions(self, width):
+        """
+        adjusts the applicable page elements to fit within the specified page dimensions.
+        :param width: width of page
+        """
+        # (self.canvas.winfo_width())
         for hr in self.post_render["hr"]:
             line, bg = hr
             x0, y0, x1, y1 = self.canvas.coords(bg)
@@ -329,13 +359,17 @@ class Renderer:
             self.canvas.coords(line, x0 + (width * 0.1), ly0, width - (width * 0.1), ly1)
 
     def bind_links(self, context):
+        """
+        binds the navigation action context.go(url) to click events on a page's link elements. needs to be run after the
+        rest of rendering is complete
+        :param context: the context where the links should trigger navigation
+        """
+        # print(self.canvas.winfo_width())
         for a in self.post_render["a"]:
             href, elements = a
             path = context.make_path(href)
-            print(f"href: {href}, path: {path}")
-            # print('elements' + str(elements))
+            # print(f"href: {href}, path: {path}")
             for element in elements:
-                # print('element' + str(element))
                 if type(element) is not tuple:
                     self.link_bind(context, element, path)
                 elif len(element) == 2:
@@ -347,8 +381,6 @@ class Renderer:
                     self.link_bind(context, title, path)
                     self.link_bind(context, item, path)
                     self.link_bind(context, bg, path)
-                # print(item)
-                # print(path)
 
     def check_hand_enter(self):
         self.canvas.config(cursor="hand2")

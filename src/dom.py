@@ -93,13 +93,13 @@ class ImgNode(HtmlNode):
         super().__init__(parent, tag, attrs)
         self.image = None
         self.url = url
-
         if self.url is not None:
             src = self.get_attr('src')
             path = self.make_path(src)
             try:
                 response = request.urlopen(path)
-                self.attrs.append(('data', base64.b64encode(response.read()).decode('utf-8')))
+                data = response.read()
+                self.attrs.append(('data', base64.b64encode(data).decode('utf-8')))
             except (HTTPError or URLError) as e:
                 print(path, e)
 
